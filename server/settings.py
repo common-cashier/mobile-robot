@@ -24,7 +24,7 @@ root_service = {
     'host': '127.0.0.1',
     'port': 8081,
 }
-middle_url = "/mobile"
+middle_url = "/pc"
 api = {
     'key': b'WLMjHQ7RAOqpzztV',
     'iv': b'WLMjHQ7RAOqpzztV',

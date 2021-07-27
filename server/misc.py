@@ -46,6 +46,6 @@ def encrypt_data(payload):
 
 
 if __name__ == "__main__":
-    post("https://uatbotapi.drippay.net/pc/last_transaction", {
+    post("https://uatbotapi.drippay.net/mobile/last_transaction", {
         "accountAlias": "中国银行-LTT(李婷婷)-1535",
     })

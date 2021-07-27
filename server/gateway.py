@@ -93,6 +93,7 @@ def start():
             params = request.get_json()
             logger.info('/start req: %s', params)
             settings.api['base'] = params['baseURL']
+            params['serialNo'] = settings.serial_no
             logger.info('/start req: %s', params)
 
             # 假数据

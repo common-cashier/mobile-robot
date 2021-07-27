@@ -25,8 +25,8 @@ def convert(data, bank):
 class BotFactory:
 
     def __init__(self):
-        # d = u2.connect('0.0.0.0')
-        self.d = u2.connect('172ddafa')
+        self.d = u2.connect('0.0.0.0')
+        # self.d = u2.connect('172ddafa')
         print('bot: %s' % settings.bot)
         self.bank = ""
         print("您的银行应用已经由脚本接管")
