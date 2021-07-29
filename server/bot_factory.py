@@ -84,7 +84,7 @@ class BotFactory:
         filter_transaction = []
         for transaction in params['transactions']:
             print("last_time=%s transaction['time']=%s" % (last_time, transaction['time']))
-            if transaction['time'] == last_time:
+            if transaction['time'] == "last_time":
                 break
             filter_transaction.append(transaction)
             i += i
