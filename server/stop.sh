@@ -14,4 +14,4 @@ done
 #for pid in $ROOT_SERVICE
 #do
 #  kill -9 $pid
-#done
+#done      ，

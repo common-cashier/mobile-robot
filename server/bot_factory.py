@@ -69,7 +69,7 @@ class BotFactory:
             self.bank = robot
         self.bank.do_work(params['do_work'])
         print("<--------------> %s" % params)
-        api.status(params['account_alias'], '3')
+        api.status(params['account_alias'], '2')
         self.doing = False
 
     def cast_transaction(self, params):
@@ -90,7 +90,7 @@ class BotFactory:
             i += i
         if len(filter_transaction) > 0:
             rsp = api.transaction(params['account_alias'], params['balance'], filter_transaction)
-            api.status(params['account_alias'], '3')
+            api.status(params['account_alias'], '2')
         self.bank.do_work("back")
         time.sleep(1)
         self.bank.do_work("back")
@@ -102,6 +102,6 @@ class BotFactory:
             return False
         self.doing = True
         rsp = api.last_transaction(params['account_alias'])
-        api.status(params['account_alias'], '3')
+        api.status(params['account_alias'], '2')
         self.doing = False
         return rsp
