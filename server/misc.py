@@ -46,6 +46,4 @@ def encrypt_data(payload):
 
 
 if __name__ == "__main__":
-    post("https://uatbotapi.drippay.net/mobile/last_transaction", {
-        "accountAlias": "中国银行-LTT(李婷婷)-1535",
-    })
+    post("https://uatbotapi.drippay.net/mobile/transaction", {'accountAlias': '中国银行-LTT(李婷婷)-1535', 'balance': '13008.79', 'transactions': [{'amount': '2138.0', 'balance': '13008.79', 'customerAccount': '6225********2853', 'direction': '0', 'flowNo': '', 'name': '杜 庆', 'postscript': '跨行转账', 'remark': '', 'sequence': '0', 'time': '2021-07-28 17:54:58'}, {'amount': '991.76', 'balance': '15146.79', 'customerAccount': '6214********3396', 'direction': '0', 'flowNo': '', 'name': '周秋华', 'postscript': '跨行转账', 'remark': '', 'sequence': '1', 'time': '2021-07-28 17:30:52'}, {'amount': '2041.48', 'balance': '16138.55', 'customerAccount': '6217***********5775', 'direction': '0', 'flowNo': '', 'name': '王卫峰', 'postscript': '转账支出', 'remark': '', 'sequence': '2', 'time': '2021-07-28 17:28:53'}]})

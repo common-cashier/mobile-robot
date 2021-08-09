@@ -8,6 +8,7 @@ from settings import Status
 import api
 
 
+
 def convert(data, bank):
     settings.bot = Bot(serial_no=settings.serial_no, bank=bank, account=data['account'])
     settings.bot.account = Account(alias=data['accountAlias'], login_name=data['loginName'],
@@ -82,8 +83,11 @@ class BotFactory:
         print("<<<<<-------------->>>>>>> %s" % last_time)
         i = 0
         filter_transaction = []
+        params['balance'] = float(params['balance']) * 100
         for transaction in params['transactions']:
             print("last_time=%s transaction['time']=%s" % (last_time, transaction['time']))
+            transaction['amount'] = float(transaction['amount']) * 100
+            transaction['balance'] = float(transaction['balance']) * 100
             if transaction['time'] == "last_time":
                 break
             filter_transaction.append(transaction)
