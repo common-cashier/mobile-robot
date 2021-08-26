@@ -159,7 +159,8 @@ def logger_config(log_path, logging_name):
     logger.addHandler(console)
     return logger
 
-
+if not os.path.exists('log'):
+    os.mkdir('log')
 today = datetime.date.today()
 logger = logger_config(log_path='./log/%s.txt' % today, logging_name='水滴手机自动机')
 
@@ -178,8 +179,6 @@ def log(msg, kind=Level.APP):
         return
     else:
         log_msg = msg
-    if not os.path.exists('log'):
-        os.mkdir('log')
     level_arr = ['App调用', '系统出错', '请求水滴服务器', '水滴服务器返回值', '外部Api', '收款凭证', '付款凭证']
     put_logs(serial_no, msg, level_arr[kind.value])
     msg = "%s - %s" % (level_arr[kind.value], msg)
