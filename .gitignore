@@ -162,3 +162,12 @@ com_crashlytics_export_strings.xml
 crashlytics.properties
 crashlytics-build.properties
 fabric.properties
+
+__init__.py
+*/__init__.py
+*/*/__init__.py
+device_id.txt
+*/verification.jpg
+*.jpg
+server/log/*.txt
+server/payment_record/*.jpg

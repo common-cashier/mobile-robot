@@ -1,7 +1,7 @@
 # coding: utf-8
 import json
 from enum import Enum
-
+from google.cloud import logging
 import numpy as np
 
 conf_file = 'config.json'
@@ -60,3 +60,14 @@ class MyEncoder(json.JSONEncoder):
             return obj.tolist()
         else:
             return super(MyEncoder, self).default(obj)
+
+
+def log(msg, kind=0):
+    logging_client = logging.Client()
+    logger = logging_client.logger(serial_no)
+    if kind == 1:
+        logger.log_text(msg, severity="ERROR")
+        print(msg)
+    else:
+        logger.log_text(msg)
+        print(msg)

@@ -87,3 +87,4 @@ class BotUtil:
         self.cast_work = cast_work
         self.cast_start = cast_start
         self.cast_account_info = cast_account_info
+
