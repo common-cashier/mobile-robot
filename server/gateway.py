@@ -1,19 +1,15 @@
 import json
-import logging
 import os
 
 from flask import Flask, request
 import settings
-import api
-from models import Account, Transaction, Bot, BotUtil
+from models import BotUtil
 from settings import gateway, serial_no, log
 
 import uiautomator2 as u2
 from bot_factory import BotFactory
 
 app = Flask(__name__)
-
-# logging.basicConfig(level=logging.DEBUG)
 
 bot_util = BotUtil()
 
@@ -32,7 +28,7 @@ def check():
         log('/check_env rsp: %s' % rsp)
     except ConnectionRefusedError:
         rsp = {'code': 2, 'msg': 'atx未启动，请先插上usb线，运行电脑脚本！'}
-        log(rsp, 1)
+        log(rsp, settings.Level.SYSTEM)
     return rsp
 
 
@@ -41,13 +37,13 @@ def status():
     if request.is_json:
         try:
             params = request.get_json()
-            logger.log_text('/status req: %s', params)
+            log('/status req: %s' % params)
             rsp = bot_util.cast_status(params)
             rsp = rsp is not None and rsp or {'code': 1, 'msg': '服务器未响应，请稍后再试!'}
             log('/status rsp: %s' % rsp)
         except ConnectionRefusedError:
             rsp = {'code': 1, 'msg': '服务未开启，请重新运行激活程序！'}
-            log(rsp, 1)
+            log(rsp, settings.Level.SYSTEM)
         return rsp
 
 
@@ -56,13 +52,13 @@ def last_transaction():
     if request.is_json:
         try:
             params = request.get_json()
-            logger.log_text('/last_transaction req: %s', params)
+            log('/last_transaction req: %s' % params)
             rsp = bot_util.cast_last_transaction(params)
             rsp = rsp is not None and rsp or {'code': 1, 'msg': '服务器未响应，请稍后再试!'}
             log('/last_transaction rsp: %s' % rsp)
         except ConnectionRefusedError:
             rsp = {'code': 1, 'msg': '服务未开启，请重新运行激活程序！'}
-            log(rsp, 1)
+            log(rsp, settings.Level.SYSTEM)
         return rsp
 
 
@@ -71,14 +67,41 @@ def transaction():
     if request.is_json:
         try:
             params = request.get_json()
-            logger.log_text('/transaction req: %s', params)
+            log('/transaction req: %s' % params)
             rsp = bot_util.cast_transaction(params)
             rsp = rsp is not None and rsp or {'code': 1, 'msg': '服务器未响应，请稍后再试!'}
             log('/transaction rsp: %s' % rsp)
         except ConnectionRefusedError:
             rsp = {'code': 1, 'msg': '服务未开启，请重新运行激活程序！'}
-            log(rsp, 1)
+            log(rsp, settings.Level.SYSTEM)
         return rsp
+
+
+@app.route('/sms', methods=['POST'])
+def sms():
+    if request.is_json:
+        try:
+            params = request.get_json()
+            print('/sms req: %s' % params)
+            if not settings.last_sms == "" and settings.last_sms == params['sms']:
+                ext = {'code': 1, 'msg': '短信已经接收，不接收重复短信'}
+                print('/sms rsp: %s' % ext)
+                return ext
+            try:
+                settings.last_sms = params['sms']
+                rsp = bot_util.cast_sms(params)
+                rsp = rsp is not None and rsp or {'code': 1, 'msg': '服务器未响应，请稍后再试!'}
+                rsp = {'code': 0, 'msg': rsp}
+                print('/sms rsp: %s ' % rsp)
+                return rsp
+            except Exception as ext:
+                ext = {'code': 1, 'msg': str(ext)}
+                print('/sms rsp: %s 需要先启动卡机' % ext)
+                return ext
+        except ConnectionRefusedError:
+            ext = {'code': 1, 'msg': '服务未开启，请重新运行激活程序！'}
+            log(ext, settings.Level.SYSTEM)
+            return ext
 
 
 @app.route('/start', methods=['POST'])
@@ -91,10 +114,20 @@ def start():
             #     return {'code': 1, 'msg': '未绑定银行卡'}
 
             params = request.get_json()
-            logger.log_text('/start req: %s', params)
+            log('/start req: %s' % params)
             settings.api['base'] = params['baseURL']
             params['serialNo'] = settings.serial_no
-            log('/start req: %s' % rsp)
+            if params['kind'] == '0':
+                if not params['bank'] in settings.receive_bank:
+                    res = {"code": 1, 'msg': '收款暂时未支持您所启动的银行，请耐心等待开发！'}
+                    log("check_bank: %s" % res)
+                    return {"code": 1, 'msg': res}
+            else:
+                if not params['bank'] in settings.payment_bank:
+                    res = {"code": 1, 'msg': '付款暂时未支持您所启动的银行，请耐心等待开发！'}
+                    log("check_bank: %s" % res)
+                    return res
+            log("check_bank: is supported")
             # 假数据
             # data = {
             #     "accountAlias": "中国银行-BOC(徐秀策)-4249）",
@@ -113,18 +146,22 @@ def start():
             bot_util.cast_work = bot_factory.cast_work
             bot_util.cast_start = bot_factory.cast_start
             bot_util.cast_account_info = bot_factory.cast_account_info
+            bot_util.cast_sms = bot_factory.cast_sms
             rsp = bot_util.cast_start(params)
+            rsp['data']['kind'] = params['kind']
+            rsp['data']['devicesId'] = settings.serial_no
             settings.account_data = rsp['data']
             # if rsp is None or rsp['code'] != 0:
             #     return {'code': 1, 'msg': '获取银行卡信息失败'}
             log("rsp['data']: %s" % rsp)
-            return {'code': 0, 'msg': '启动成功', 'data': rsp}
+            return {'code': 0, 'msg': '启动成功', 'data': rsp['data']}
         except ConnectionRefusedError:
             rsp = {'code': 1, 'msg': '服务未开启，请重新运行激活程序！'}
-            log(rsp, 1)
+            log(rsp, settings.Level.SYSTEM)
         except Exception:
+            rsp = {'code': 0, 'msg': '启动成功', 'data': '启动错误，请联系客服人员！'}
             log('/start rsp: %s' % rsp)
-            return {'code': 0, 'msg': '启动成功', 'data': rsp}
+            return rsp
         return {'code': 0, 'msg': '启动成功', 'data': rsp}
 
 
@@ -137,14 +174,8 @@ def account_info():
         log('/account_info rsp: %s' % rsp)
     except ConnectionRefusedError:
         rsp = {'code': 2, 'msg': 'atx未启动，请先插上usb线，运行电脑脚本！'}
-        log(rsp, 1)
+        log(rsp, settings.Level.SYSTEM)
     return rsp
-
-
-@app.route('/stop', methods=['GET'])
-def stop():
-    bot_util.cast_stop()
-    log('/stop', 1)
 
 
 @app.route('/do_work', methods=['POST'])
@@ -152,13 +183,15 @@ def do_work():
     if request.is_json:
         try:
             params = request.get_json()
-            logger.log_text('/do_work req: %s', params)
+            log('/do_work req: %s' % params)
+            if bot_util.cast_work is None:
+                return {'code': 1, 'msg': '请先启动卡机！'}
             bot_util.cast_work(params)
             rsp = {'code': 0, 'msg': '正在执行任务！'}
-            log(params)
+            log("do_work: %s" % params)
         except ConnectionRefusedError:
             rsp = {'code': 1, 'msg': '服务器异常，无法执行任务！'}
-            logger.log_text("{'code': 1, 'msg': '服务器异常，无法执行任务！'}", severity="ERROR")
+            log("{'code': 1, 'msg': '服务器异常，无法执行任务！'}", settings.Level.SYSTEM)
         return rsp
 
 

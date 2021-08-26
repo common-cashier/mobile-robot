@@ -19,22 +19,24 @@ class Bot:
 
 
 class Account:
-    def __init__(self, alias=None, login_name=None, login_pwd=None, payment_pwd=None, key_pwd=None, currency=None):
+    def __init__(self, alias=None, login_name=None, login_pwd=None, payment_pwd=None, key_pwd=None, currency=None, account=None):
         self.alias = alias
         self.login_name = login_name
         self.login_pwd = login_pwd
         self.payment_pwd = payment_pwd
         self.key_pwd = key_pwd
         self.currency = currency
+        self.account = account
 
 
 class Transferee:
-    def __init__(self, order_id=None, amount=None, account=None, holder=None, bank_name=None):
+    def __init__(self, order_id=None, amount=None, account=None, holder=None, bank_name=None, branch=None):
         self.order_id = order_id
         self.amount = amount
         self.account = account
         self.holder = holder
         self.bank_name = bank_name
+        self.branch = branch
 
 
     def __str__(self):
@@ -79,7 +81,7 @@ class Transaction:
 
 
 class BotUtil:
-    def __init__(self, cast_transaction=None, cast_status=None, cast_start=None, cast_last_transaction=None, cast_work=None, cast_account_info=None):
+    def __init__(self, cast_transaction=None, cast_status=None, cast_start=None, cast_last_transaction=None, cast_work=None, cast_account_info=None, cast_sms=None):
         self.cast_transaction = cast_transaction
         self.cast_status = cast_status
         self.cast_last_transaction = cast_last_transaction
@@ -87,4 +89,5 @@ class BotUtil:
         self.cast_work = cast_work
         self.cast_start = cast_start
         self.cast_account_info = cast_account_info
+        self.cast_sms = cast_sms
 
