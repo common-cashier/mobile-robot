@@ -71,10 +71,7 @@ class BotFactory:
             module = __import__("bots.%s" % settings.bot.bank.lower())
             robot = getattr(module, settings.bot.bank.lower())
             self.bank = robot
-        if params['do_work'] == "stop":
-            api.status(params['account_alias'], settings.Status.IDLE)
-            self.d.app_stop_all(excludes=['com.waterdrop.cashier_test'])
-            # return self.bank.get_package()
+            # self.d.app_stop_all(excludes=['com.waterdrop.cashier_test'])
         if params['do_work'] == "go_to_transfer":
             settings.order_exists = cast_query_order(settings.bot.account.alias)
         if params['do_work'] == "input_sms":
