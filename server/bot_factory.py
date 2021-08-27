@@ -72,8 +72,8 @@ class BotFactory:
             robot = getattr(module, settings.bot.bank.lower())
             self.bank = robot
         if params['do_work'] == "stop":
-            self.d.app_stop_all()
             api.status(params['account_alias'], settings.Status.IDLE)
+            self.d.app_stop_all()
             # return self.bank.get_package()
         if params['do_work'] == "go_to_transfer":
             settings.order_exists = cast_query_order(settings.bot.account.alias)
