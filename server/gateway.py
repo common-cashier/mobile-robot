@@ -29,6 +29,9 @@ def check():
     except ConnectionRefusedError:
         rsp = {'code': 2, 'msg': 'atx未启动，请先插上usb线，运行电脑脚本！'}
         log(rsp, settings.Level.SYSTEM)
+    except Exception as ext:
+        rsp = {'code': 1, 'msg': ext}
+        log(rsp, settings.Level.SYSTEM)
     return rsp
 
 
@@ -43,6 +46,9 @@ def status():
             log('/status rsp: %s' % rsp)
         except ConnectionRefusedError:
             rsp = {'code': 1, 'msg': '服务未开启，请重新运行激活程序！'}
+            log(rsp, settings.Level.SYSTEM)
+        except Exception as ext:
+            rsp = {'code': 1, 'msg': ext}
             log(rsp, settings.Level.SYSTEM)
         return rsp
 
@@ -59,6 +65,9 @@ def last_transaction():
         except ConnectionRefusedError:
             rsp = {'code': 1, 'msg': '服务未开启，请重新运行激活程序！'}
             log(rsp, settings.Level.SYSTEM)
+        except Exception as ext:
+            rsp = {'code': 1, 'msg': ext}
+            log(rsp, settings.Level.SYSTEM)
         return rsp
 
 
@@ -73,6 +82,9 @@ def transaction():
             log('/transaction rsp: %s' % rsp)
         except ConnectionRefusedError:
             rsp = {'code': 1, 'msg': '服务未开启，请重新运行激活程序！'}
+            log(rsp, settings.Level.SYSTEM)
+        except Exception as ext:
+            rsp = {'code': 1, 'msg': ext}
             log(rsp, settings.Level.SYSTEM)
         return rsp
 
@@ -158,9 +170,9 @@ def start():
         except ConnectionRefusedError:
             rsp = {'code': 1, 'msg': '服务未开启，请重新运行激活程序！'}
             log(rsp, settings.Level.SYSTEM)
-        except Exception:
-            rsp = {'code': 0, 'msg': '启动成功', 'data': '启动错误，请联系客服人员！'}
-            log('/start rsp: %s' % rsp)
+        except Exception as ext:
+            rsp = {'code': 1, 'msg': ext}
+            log(rsp, settings.Level.SYSTEM)
             return rsp
         return {'code': 0, 'msg': '启动成功', 'data': rsp}
 
@@ -174,6 +186,9 @@ def account_info():
         log('/account_info rsp: %s' % rsp)
     except ConnectionRefusedError:
         rsp = {'code': 2, 'msg': 'atx未启动，请先插上usb线，运行电脑脚本！'}
+        log(rsp, settings.Level.SYSTEM)
+    except Exception as ext:
+        rsp = {'code': 1, 'msg': ext}
         log(rsp, settings.Level.SYSTEM)
     return rsp
 
@@ -192,6 +207,9 @@ def do_work():
         except ConnectionRefusedError:
             rsp = {'code': 1, 'msg': '服务器异常，无法执行任务！'}
             log("{'code': 1, 'msg': '服务器异常，无法执行任务！'}", settings.Level.SYSTEM)
+        except Exception as ext:
+            rsp = {'code': 1, 'msg': ext}
+            log(rsp, settings.Level.SYSTEM)
         return rsp
 
 
