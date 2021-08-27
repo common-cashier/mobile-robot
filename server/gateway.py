@@ -199,11 +199,11 @@ def do_work():
         try:
             params = request.get_json()
             log('/do_work req: %s' % params)
+            if bot_util.cast_work is None:
+                return {'code': 1, 'msg': '请先启动卡机！'}
             if params['do_work'] == "stop":
                 api.status(params['account_alias'], settings.Status.IDLE)
                 return {'code': 0, 'msg': '卡机状态已经上报！'}
-            if bot_util.cast_work is None:
-                return {'code': 1, 'msg': '请先启动卡机！'}
             bot_util.cast_work(params)
             rsp = {'code': 0, 'msg': '正在执行任务！'}
             log("do_work: %s" % params)
