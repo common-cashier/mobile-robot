@@ -20,8 +20,6 @@ def start():
     settings.bot.pid = self.app_start(package)
     return self.app_wait(package)  # 等待应用运行, return pid(int)
 
-def get_package():
-    return package
 
 def input_pwd():
     original = {
