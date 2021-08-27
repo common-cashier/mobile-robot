@@ -201,8 +201,12 @@ def do_work():
             log('/do_work req: %s' % params)
             if bot_util.cast_work is None:
                 return {'code': 1, 'msg': '请先启动卡机！'}
-            bot_util.cast_work(params)
-            rsp = {'code': 0, 'msg': '正在执行任务！'}
+            if params['do_work'] == "stop":
+                msg = bot_util.cast_work(params)
+                rsp = {'code': 0, 'msg': msg}
+            else:
+                bot_util.cast_work(params)
+                rsp = {'code': 0, 'msg': '正在执行任务！'}
             log("do_work: %s" % params)
         except ConnectionRefusedError:
             rsp = {'code': 1, 'msg': '服务器异常，无法执行任务！'}
