@@ -200,6 +200,8 @@ def do_work():
             params = request.get_json()
             log('/do_work req: %s' % params)
             if params['do_work'] == "stop":
+                if params['extension'] not None and params['extension'] != '':
+                    settings.api['base'] = params['extension']
                 api.status(params['account_alias'], settings.Status.IDLE)
                 return {'code': 0, 'msg': '卡机状态已经上报！'}
             if bot_util.cast_work is None:
