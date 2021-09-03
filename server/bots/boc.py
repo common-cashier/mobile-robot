@@ -165,8 +165,7 @@ def go_to_transfer():
                     self.send_keys(settings.transferee.account, clear=True)
                     if self.xpath(
                         '//*[@resource-id="com.chinamworld.bocmbci:id/trans_remit_openbank"]/android.widget.LinearLayout['
-                        '1]/android.widget.RelativeLayout[1]/android.widget.ImageView[1]')
-                    .exists(timeout=5):
+                        '1]/android.widget.RelativeLayout[1]/android.widget.ImageView[1]').exists(timeout=5):
                         self.xpath(
                             '//*[@resource-id="com.chinamworld.bocmbci:id/trans_remit_openbank"]/android.widget.LinearLayout['
                             '1]/android.widget.RelativeLayout[1]/android.widget.ImageView[1]').click()
