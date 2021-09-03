@@ -161,7 +161,7 @@ def go_to_transfer():
                     input_amount()
                     self(resourceId="com.chinamworld.bocmbci:id/trans_remit_payeename").click()
                     self.send_keys(settings.transferee.holder, clear=True)
-                    self(resourceId="com.chinamworld.bocmbci:id/clear_edit_context", text="请输入").click()
+                    self(resourceId="com.chinamworld.bocmbci:id/clear_edit_context").click()
                     self.send_keys(settings.transferee.account, clear=True)
                     if self.xpath(
                         '//*[@resource-id="com.chinamworld.bocmbci:id/trans_remit_openbank"]/android.widget.LinearLayout['
