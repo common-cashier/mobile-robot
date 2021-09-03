@@ -176,11 +176,7 @@ def go_to_transfer():
                     amount = ("%.2f" % float(settings.transferee.amount))
                     done_num = ("%.2f" % float(self(resourceId="com.chinamworld.bocmbci:id/view_money").get_text()))
                     settings.log("amount: %s, done_num: %s" % (amount, done_num))
-                    if amount == done_num:
-                        submit_btn()
-                    else:
-                        input_amount()
-                        submit_btn()
+                    submit_btn()
 
 
 def input_sms(sms):
