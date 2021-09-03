@@ -166,9 +166,9 @@ def go_to_transfer():
                     if self(resourceId="com.chinamworld.bocmbci:id/choice_data_arrow", description="点击更换收款银行").exists(timeout=5):
                         self(resourceId="com.chinamworld.bocmbci:id/choice_data_arrow", description="点击更换收款银行").click()
                         self.swipe_ext("up", scale=0.8)
-                    if self.xpath('//*[@resource-id="com.chinamworld.bocmbci:id/trans_remit_openbank"]/android.widget.LinearLayout[1]/android.widget.RelativeLayout[1]/android.widget.ImageView[1]').exists:
-                        self.xpath('//*[@resource-id="com.chinamworld.bocmbci:id/trans_remit_openbank"]/android.widget.LinearLayout[1]/android.widget.RelativeLayout[1]/android.widget.ImageView[1]').click()
-                        self.swipe_ext("up", scale=0.8)
+                    # if self.xpath('//*[@resource-id="com.chinamworld.bocmbci:id/trans_remit_openbank"]/android.widget.LinearLayout[1]/android.widget.RelativeLayout[1]/android.widget.ImageView[1]').exists:
+                    #     self.xpath('//*[@resource-id="com.chinamworld.bocmbci:id/trans_remit_openbank"]/android.widget.LinearLayout[1]/android.widget.RelativeLayout[1]/android.widget.ImageView[1]').click()
+                    #     self.swipe_ext("up", scale=0.8)
                     # amount = ("%.2f" % float(settings.transferee.amount))
                     # done_num = ("%.2f" % float(self(resourceId="com.chinamworld.bocmbci:id/view_money").get_text()))
                     # settings.log("amount: %s, done_num: %s" % (amount, done_num))
