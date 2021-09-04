@@ -210,6 +210,9 @@ def input_sms(sms):
 def submit_btn():
     self(resourceId="com.chinamworld.bocmbci:id/trans_remit_next").click()
     if self(resourceId="com.chinamworld.bocmbci:id/tv_name", text="安全工具").exists(timeout=20):
+        self(resourceId="com.chinamworld.bocmbci:id/tv_btn").click()
+        self.sleep(2)
+        self.xpath('//*[@resource-id="com.chinamworld.bocmbci:id/list_view"]/android.widget.RelativeLayout[1]').click()
         self(resourceId="com.chinamworld.bocmbci:id/btn_ok").click()
 
 
