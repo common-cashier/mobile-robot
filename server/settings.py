@@ -32,7 +32,7 @@ root_service = {
     'host': '127.0.0.1',
     'port': 8081,
 }
-middle_url = "/pc"
+middle_url = "/mobile"
 bank_map = {
     'CCB': '中国建设银行',
     'ICBC': '中国工商银行',
