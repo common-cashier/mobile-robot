@@ -27,6 +27,10 @@ def transfer_result(order_id, order_status, msg=''):
     return post(api['transfer_result'], {'orderId': order_id, 'status': order_status, 'msg': msg})
 
 
+def receipt(account_alias, receipts):
+    return post(api['receipt'], {'accountAlias': account_alias, "receipts": receipts})
+
+
 def post(url, payload):
     url = api['base'] + url
     print('-------------------> %s' % url)

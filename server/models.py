@@ -91,3 +91,14 @@ class BotUtil:
         self.cast_account_info = cast_account_info
         self.cast_sms = cast_sms
 
+
+class Receipt:
+    def __init__(self, time=None, amount=None, name=None, postscript=None, customerAccount=None, inner=None , flowNo=None, sequence=None):
+        self.time = time
+        self.amount = amount
+        self.name = name
+        self.postscript = postscript
+        self.customerAccount = customerAccount
+        self.inner = inner
+        self.flowNo = flowNo
+        self.sequence = sequence

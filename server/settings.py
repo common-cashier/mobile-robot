@@ -19,6 +19,9 @@ last_sms = ""
 order_exists = True
 transferee = ""
 log_msg = ""
+need_receipt = False
+last_transferee = ""
+payment_time = ""
 
 with open('../device_id.txt') as fd:
     serial_no = fd.readline().strip()
@@ -72,7 +75,8 @@ api = {
     'transaction': '%s/transaction' % middle_url,
     'last_transaction': '%s/last_transaction' % middle_url,
     'upload_img_vc': '%s/upload_image_verify_code' % middle_url,
-    'transfer_result': '%s/transfer_result' % middle_url
+    'transfer_result': '%s/transfer_result' % middle_url,
+    'receipt': '%s/receipt' % middle_url
 }
 
 payment_bank = [
@@ -114,6 +118,10 @@ class Level(Enum):
     RECEIPT_OF_RECEIVE = 5
     # 付款凭证
     RECEIPT_OF_PAYMENT = 6
+    # 回单
+    RECEIPT = 7
+    # 公共测试
+    COMMON = 8
 
 
 class MyEncoder(json.JSONEncoder):
@@ -179,7 +187,7 @@ def log(msg, kind=Level.APP):
         return
     else:
         log_msg = msg
-    level_arr = ['App调用', '系统出错', '请求水滴服务器', '水滴服务器返回值', '外部Api', '收款凭证', '付款凭证']
+    level_arr = ['App调用', '系统出错', '请求水滴服务器', '水滴服务器返回值', '外部Api', '收款凭证', '付款凭证', '回单', '公共测试']
     put_logs(serial_no, msg, level_arr[kind.value])
     msg = "%s - %s" % (level_arr[kind.value], msg)
     logger.warning(msg)

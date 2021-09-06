@@ -3,7 +3,6 @@ import os
 import sys
 
 sys.path.append("..")
-from models import Transferee
 import api
 import settings
 from bots.verification.verification_code import VerificationCode
@@ -11,8 +10,6 @@ from bots.verification.verification_code import VerificationCode
 package = 'com.chinamworld.bocmbci'
 activity = 'com.boc.bocsoft.mobile.bocmobile.buss.system.main.ui.MainActivity'
 self = settings.bot.device
-
-
 
 
 def start():
@@ -141,38 +138,47 @@ def go_to_transaction():
 
 
 def go_to_transfer():
-    if not settings.order_exists:
+    if settings.need_receipt:
+        go_to_transaction()
+        if settings.order_exists:
+            transfer()
+    elif not settings.order_exists:
         go_to_transaction()
     else:
-        self(text="转账").click()
-        self.wait_activity("com.boc.bocsoft.mobile.bocmobile.buss.transfer.common.activity.TransferActivity",
-                           timeout=10)
-        self(text="账号转账").click()
-        if self(resourceId="com.chinamworld.bocmbci:id/txt_money_title").exists(timeout=60):
-            self.xpath(
-                '//*[@resource-id="com.chinamworld.bocmbci:id/transfer_payeracc"]/android.widget.LinearLayout['
-                '1]/android.widget.RelativeLayout[1]/android.widget.RelativeLayout[1]').click()
-            get_account = self(resourceId="com.chinamworld.bocmbci:id/tv_number").get_text()
-            get_account = get_account[-4:-1]
-            account = settings.bot.account.account[-4:-1]
-            if get_account == account:
-                self(resourceId="com.chinamworld.bocmbci:id/tv_number").click()
-                if self(resourceId="com.chinamworld.bocmbci:id/txt_money_title").exists(timeout=10):
-                    input_amount()
-                    self(resourceId="com.chinamworld.bocmbci:id/trans_remit_payeename").click()
-                    self.send_keys(settings.transferee.holder, clear=True)
-                    self(resourceId="com.chinamworld.bocmbci:id/clear_edit_context").click()
-                    self.send_keys(settings.transferee.account, clear=True)
-                    if self(resourceId="com.chinamworld.bocmbci:id/choice_data_arrow", description="点击更换收款银行").exists(timeout=5):
-                        self(resourceId="com.chinamworld.bocmbci:id/choice_data_arrow", description="点击更换收款银行").click()
-                        self.swipe_ext("up", scale=0.8)
-                    # if self.xpath('//*[@resource-id="com.chinamworld.bocmbci:id/trans_remit_openbank"]/android.widget.LinearLayout[1]/android.widget.RelativeLayout[1]/android.widget.ImageView[1]').exists:
-                    #     self.xpath('//*[@resource-id="com.chinamworld.bocmbci:id/trans_remit_openbank"]/android.widget.LinearLayout[1]/android.widget.RelativeLayout[1]/android.widget.ImageView[1]').click()
-                    #     self.swipe_ext("up", scale=0.8)
-                    # amount = ("%.2f" % float(settings.transferee.amount))
-                    # done_num = ("%.2f" % float(self(resourceId="com.chinamworld.bocmbci:id/view_money").get_text()))
-                    # settings.log("amount: %s, done_num: %s" % (amount, done_num))
-                    submit_btn()
+        transfer()
+
+
+def transfer():
+    self(text="转账").click()
+    self.wait_activity("com.boc.bocsoft.mobile.bocmobile.buss.transfer.common.activity.TransferActivity",
+                       timeout=10)
+    self(text="账号转账").click()
+    if self(resourceId="com.chinamworld.bocmbci:id/txt_money_title").exists(timeout=60):
+        self.xpath(
+            '//*[@resource-id="com.chinamworld.bocmbci:id/transfer_payeracc"]/android.widget.LinearLayout['
+            '1]/android.widget.RelativeLayout[1]/android.widget.RelativeLayout[1]').click()
+        get_account = self(resourceId="com.chinamworld.bocmbci:id/tv_number").get_text()
+        get_account = get_account[-4:-1]
+        account = settings.bot.account.account[-4:-1]
+        if get_account == account:
+            self(resourceId="com.chinamworld.bocmbci:id/tv_number").click()
+            if self(resourceId="com.chinamworld.bocmbci:id/txt_money_title").exists(timeout=10):
+                input_amount()
+                self(resourceId="com.chinamworld.bocmbci:id/trans_remit_payeename").click()
+                self.send_keys(settings.transferee.holder, clear=True)
+                self(resourceId="com.chinamworld.bocmbci:id/clear_edit_context").click()
+                self.send_keys(settings.transferee.account, clear=True)
+                if self(resourceId="com.chinamworld.bocmbci:id/choice_data_arrow", description="点击更换收款银行").exists(
+                        timeout=5):
+                    self(resourceId="com.chinamworld.bocmbci:id/choice_data_arrow", description="点击更换收款银行").click()
+                    self.swipe_ext("up", scale=0.8)
+                # if self.xpath('//*[@resource-id="com.chinamworld.bocmbci:id/trans_remit_openbank"]/android.widget.LinearLayout[1]/android.widget.RelativeLayout[1]/android.widget.ImageView[1]').exists:
+                #     self.xpath('//*[@resource-id="com.chinamworld.bocmbci:id/trans_remit_openbank"]/android.widget.LinearLayout[1]/android.widget.RelativeLayout[1]/android.widget.ImageView[1]').click()
+                #     self.swipe_ext("up", scale=0.8)
+                # amount = ("%.2f" % float(settings.transferee.amount))
+                # done_num = ("%.2f" % float(self(resourceId="com.chinamworld.bocmbci:id/view_money").get_text()))
+                # settings.log("amount: %s, done_num: %s" % (amount, done_num))
+                submit_btn()
 
 
 def input_sms(sms):
@@ -192,7 +198,8 @@ def input_sms(sms):
         btn_xy = sms_switcher.get(i)
         self.click(btn_xy[0], btn_xy[1])
         self.sleep(1)
-    settings.log("cast_sms: %s" % sms)
+    settings.payment_time = datetime.datetime.now()
+    settings.log("cast_sms: %s payment_time: %s" % (sms, settings.payment_time))
     if self(resourceId="com.chinamworld.bocmbci:id/tv_detail").exists(timeout=20):
         self.sleep(3)
         if not os.path.exists('payment_record'):
@@ -201,6 +208,8 @@ def input_sms(sms):
         self.sleep(1)
         api.transfer_result(settings.transferee.order_id, True)
         settings.log("payment: 付款成功 %s" % str(settings.transferee), settings.Level.RECEIPT_OF_PAYMENT)
+        settings.need_receipt = True
+        settings.last_transferee = settings.transferee
         self(resourceId="com.chinamworld.bocmbci:id/btn_home").click()
     else:
         api.transfer_result(settings.transferee.order_id, False)

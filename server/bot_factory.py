@@ -1,8 +1,9 @@
+import datetime
 import time
 
 import uiautomator2 as u2
 import settings
-from models import Bot, Account, Transferee
+from models import Bot, Account, Transferee, Receipt
 from misc import parse_sms
 from settings import log
 import api
@@ -105,11 +106,26 @@ class BotFactory:
         print("<<<<<-------------->>>>>>> %s" % last_time)
         i = 0
         filter_transaction = []
-        params['balance'] = round(float(params['balance']) * 100, 2)
+        params['balance'] = "%.2f" % (float(params['balance']) * 100)
         for transaction in params['transactions']:
             print("last_time=%s transaction['time']=%s" % (last_time, transaction['time']))
+            #  查看是否需要回单
+            if settings.need_receipt:
+                log('need_receipt: %s -- %s' % (str(settings.last_transferee), str(transaction)), settings.Level.COMMON)
+                transaction_time = datetime.strptime(transaction['time'], '%Y-%m-%d %H:%M:%S')
+                if settings.last_transferee.amount == transaction['amount'] and settings.last_transferee.holder == transaction['name'] and (
+                        settings.payment_time <= transaction_time < (settings.payment_time + datetime.timedelta(minutes=20))):
+                    log('need_receipt_compare: transferee_amount:%s = transaction_amount:%s -- holder:%s = name:%s' % (settings.last_transferee.amount, transaction['amount'], settings.last_transferee.holder, transaction['name']), settings.Level.RECEIPT)
+                    inner = True
+                    if transaction['postscript'] == '跨行转账':
+                        inner = False
+                    receipt = Receipt(transaction['time'], transaction['amount'], transaction['name'], transaction['postscript'], transaction['customerAccount'], inner, transaction['flowNo'], transaction['sequence'])
+                    api.receipt(settings.serial_no, [receipt])
+                    settings.need_receipt = False
+            # 改变单位适应水滴
             transaction['amount'] = "%.2f" % (float(transaction['amount']) * 100)
             transaction['balance'] = "%.2f" % (float(transaction['balance']) * 100)
+            # 查看服务器最后一条
             if transaction['time'] == last_time:
                 break
             filter_transaction.append(transaction)
