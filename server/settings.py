@@ -4,8 +4,7 @@ import json
 import os
 from enum import Enum
 import numpy as np
-
-from models import Transferee
+import logging
 from sls_quick_start import put_logs
 
 conf_file = 'config.json'
@@ -136,8 +135,6 @@ class MyEncoder(json.JSONEncoder):
             return super(MyEncoder, self).default(obj)
 
 
-import logging
-
 
 def logger_config(log_path, logging_name):
     '''
@@ -166,6 +163,7 @@ def logger_config(log_path, logging_name):
     logger.addHandler(handler)
     logger.addHandler(console)
     return logger
+
 
 if not os.path.exists('log'):
     os.mkdir('log')

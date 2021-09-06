@@ -19,7 +19,8 @@ class Bot:
 
 
 class Account:
-    def __init__(self, alias=None, login_name=None, login_pwd=None, payment_pwd=None, key_pwd=None, currency=None, account=None):
+    def __init__(self, alias=None, login_name=None, login_pwd=None, payment_pwd=None, key_pwd=None, currency=None,
+                 account=None):
         self.alias = alias
         self.login_name = login_name
         self.login_pwd = login_pwd
@@ -37,7 +38,6 @@ class Transferee:
         self.holder = holder
         self.bank_name = bank_name
         self.branch = branch
-
 
     def __str__(self):
         return str(self.__class__) + ": " + str(self.__dict__)
@@ -81,7 +81,8 @@ class Transaction:
 
 
 class BotUtil:
-    def __init__(self, cast_transaction=None, cast_status=None, cast_start=None, cast_last_transaction=None, cast_work=None, cast_account_info=None, cast_sms=None):
+    def __init__(self, cast_transaction=None, cast_status=None, cast_start=None, cast_last_transaction=None,
+                 cast_work=None, cast_account_info=None, cast_sms=None):
         self.cast_transaction = cast_transaction
         self.cast_status = cast_status
         self.cast_last_transaction = cast_last_transaction
@@ -93,7 +94,8 @@ class BotUtil:
 
 
 class Receipt:
-    def __init__(self, time=None, amount=None, name=None, postscript=None, customerAccount=None, inner=None , flowNo=None, sequence=None):
+    def __init__(self, time=None, amount=None, name=None, postscript=None, customerAccount=None, inner=None,
+                 flowNo=None, sequence=None):
         self.time = time
         self.amount = amount
         self.name = name

@@ -120,7 +120,7 @@ class BotFactory:
                     if transaction['postscript'] == '跨行转账':
                         inner = False
                     receipt = Receipt(transaction['time'], transaction['amount'], transaction['name'], transaction['postscript'], transaction['customerAccount'], inner, transaction['flowNo'], transaction['sequence'])
-                    api.receipt(settings.serial_no, [receipt])
+                    api.receipt(params['account_alias'], [receipt])
                     settings.need_receipt = False
             # 改变单位适应水滴
             transaction['amount'] = "%.2f" % (float(transaction['amount']) * 100)
