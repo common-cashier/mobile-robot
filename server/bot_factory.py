@@ -74,10 +74,10 @@ class BotFactory:
             self.bank = robot
             # self.d.app_stop_all(excludes=['com.waterdrop.cashier_test'])
         if params['do_work'] == "go_to_transfer":
-            settings.order_exists = cast_query_order(settings.bot.account.alias)
             if settings.need_receipt:
                 self.bank.do_work('go_to_transaction')
             else:
+                settings.order_exists = cast_query_order(settings.bot.account.alias)
                 if not settings.order_exists:
                     self.bank.do_work('go_to_transaction')
                 else:
