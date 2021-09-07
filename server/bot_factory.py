@@ -75,12 +75,21 @@ class BotFactory:
             # self.d.app_stop_all(excludes=['com.waterdrop.cashier_test'])
         if params['do_work'] == "go_to_transfer":
             settings.order_exists = cast_query_order(settings.bot.account.alias)
+            if settings.need_receipt:
+                self.bank.do_work('go_to_transaction')
+            else:
+                if not settings.order_exists:
+                    self.bank.do_work('go_to_transaction')
+                else:
+                    self.bank.do_work('transfer')
+            api.status(params['account_alias'], settings.Status.RUNNING)
+            self.doing = False
+            return False
         if params['do_work'] == "input_sms":
             return self.bank.input_sms(params['sms'])
         else:
             api.status(params['account_alias'], settings.Status.RUNNING)
-
-        print("<--------------> %s" % params)
+        print("do_work:print: %s" % params)
         self.bank.do_work(params['do_work'])
         self.doing = False
 

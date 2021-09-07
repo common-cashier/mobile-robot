@@ -137,17 +137,6 @@ def go_to_transaction():
     self(resourceId="com.chinamworld.bocmbci:id/btn_left").click()
 
 
-def go_to_transfer():
-    if settings.need_receipt:
-        go_to_transaction()
-        if settings.order_exists:
-            transfer()
-    elif not settings.order_exists:
-        go_to_transaction()
-    else:
-        transfer()
-
-
 def transfer():
     if self(text="转账").exists(timeout=20):
         self(text="转账").click()
@@ -178,12 +167,6 @@ def transfer():
                         self.sleep(2)
                         self.swipe_ext("up", scale=0.8)
                         self.sleep(2)
-                    # if self.xpath('//*[@resource-id="com.chinamworld.bocmbci:id/trans_remit_openbank"]/android.widget.LinearLayout[1]/android.widget.RelativeLayout[1]/android.widget.ImageView[1]').exists:
-                    #     self.xpath('//*[@resource-id="com.chinamworld.bocmbci:id/trans_remit_openbank"]/android.widget.LinearLayout[1]/android.widget.RelativeLayout[1]/android.widget.ImageView[1]').click()
-                    #     self.swipe_ext("up", scale=0.8)
-                    # amount = ("%.2f" % float(settings.transferee.amount))
-                    # done_num = ("%.2f" % float(self(resourceId="com.chinamworld.bocmbci:id/view_money").get_text()))
-                    # settings.log("amount: %s, done_num: %s" % (amount, done_num))
                     submit_btn()
 
 
@@ -289,5 +272,5 @@ def do_work(task_name):
         self.press("home")
     if task_name == "back":
         self.press("back")
-    if task_name == "go_to_transfer":
-        go_to_transfer()
+    if task_name == "transfer":
+        transfer()
