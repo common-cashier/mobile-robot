@@ -112,8 +112,8 @@ class BotFactory:
             #  查看是否需要回单
             if settings.need_receipt:
                 log('need_receipt: %s -- %s' % (str(settings.last_transferee), str(transaction)), settings.Level.COMMON)
-                transaction_time = datetime.strptime(transaction['time'], '%Y-%m-%d %H:%M:%S')
-                if settings.last_transferee.amount == transaction['amount'] and settings.last_transferee.holder == transaction['name'] and (
+                transaction_time = datetime.datetime.strptime(transaction['time'], '%Y-%m-%d %H:%M:%S')
+                if settings.last_transferee.amount == "%.2f" % (float(transaction['amount'])) and settings.last_transferee.holder == transaction['name'] and (
                         settings.payment_time <= transaction_time < (settings.payment_time + datetime.timedelta(minutes=20))):
                     log('need_receipt_compare: transferee_amount:%s = transaction_amount:%s -- holder:%s = name:%s' % (settings.last_transferee.amount, transaction['amount'], settings.last_transferee.holder, transaction['name']), settings.Level.RECEIPT)
                     inner = True
