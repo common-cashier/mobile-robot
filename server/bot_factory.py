@@ -137,6 +137,7 @@ class BotFactory:
                 break
             filter_transaction.append(transaction)
             i += i
+        settings.need_receipt = False
         if len(filter_transaction) > 0:
             log('transaction_report: ' + str(filter_transaction), settings.Level.RECEIPT_OF_RECEIVE)
             rsp = api.transaction(params['account_alias'], params['balance'], filter_transaction)
