@@ -136,9 +136,11 @@ class BotFactory:
             log('transaction_report: ' + str(filter_transaction), settings.Level.RECEIPT_OF_RECEIVE)
             rsp = api.transaction(params['account_alias'], params['balance'], filter_transaction)
             api.status(params['account_alias'], settings.Status.RUNNING)
+        time.sleep(3)
         self.bank.do_work("back")
-        time.sleep(1)
+        time.sleep(3)
         self.bank.do_work("back")
+        time.sleep(3)
         self.doing = False
         return rsp
 
