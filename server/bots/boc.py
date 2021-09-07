@@ -138,18 +138,13 @@ def go_to_transaction():
 
 
 def go_to_transfer():
-    settings.log('go_to_transfer -> settings.need_receipt: %s' % settings.need_receipt, settings.Level.COMMON)
     if settings.need_receipt:
-        settings.log('go_to_transfer -> go_to_transaction', settings.Level.COMMON)
         go_to_transaction()
         if settings.order_exists:
-            settings.log('go_to_transfer -> settings.order_exists go to transfer: %s' % settings.order_exists, settings.Level.COMMON)
             transfer()
     elif not settings.order_exists:
-        settings.log('go_to_transfer -> settings.order_exists elif: %s' % settings.order_exists, settings.Level.COMMON)
         go_to_transaction()
     else:
-        settings.log('go_to_transfer -> go to transfer', settings.Level.COMMON)
         transfer()
 
 
