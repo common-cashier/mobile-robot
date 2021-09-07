@@ -215,6 +215,7 @@ def input_sms(sms):
         settings.log("payment: 付款成功 %s" % str(settings.transferee), settings.Level.RECEIPT_OF_PAYMENT)
         settings.need_receipt = True
         settings.last_transferee = settings.transferee
+        self.sleep(5)
         self(resourceId="com.chinamworld.bocmbci:id/btn_home").click()
     else:
         api.transfer_result(settings.transferee.order_id, False)

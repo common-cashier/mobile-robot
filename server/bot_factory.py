@@ -119,7 +119,9 @@ class BotFactory:
                     inner = True
                     if transaction['postscript'] == '跨行转账':
                         inner = False
-                    # receipt = Receipt(transaction['time'], transaction['amount'], transaction['name'], transaction['postscript'], transaction['customerAccount'], inner, transaction['flowNo'], transaction['sequence'])
+                    # receipt = Receipt(transaction['time'], transaction['amount'], transaction['name'], transaction[
+                    # 'postscript'], transaction['customerAccount'], inner, transaction['flowNo'], transaction[
+                    # 'sequence'])
                     api.receipt(params['account_alias'], [{'time': transaction['time'], 'amount': transaction['amount'], 'name': transaction['name'], 'postscript': transaction['postscript'], 'customerAccount': transaction['customerAccount'], 'inner': inner, 'flowNo': transaction['flowNo'], 'sequence': transaction['sequence']}])
                     settings.need_receipt = False
             # 改变单位适应水滴
