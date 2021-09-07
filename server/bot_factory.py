@@ -113,16 +113,21 @@ class BotFactory:
             if settings.need_receipt:
                 log('need_receipt: %s -- %s' % (str(settings.last_transferee), str(transaction)), settings.Level.COMMON)
                 transaction_time = datetime.datetime.strptime(transaction['time'], '%Y-%m-%d %H:%M:%S')
-                if settings.last_transferee.amount == "%.2f" % (float(transaction['amount'])) and settings.last_transferee.holder == transaction['name'] and (
-                        settings.payment_time <= transaction_time < (settings.payment_time + datetime.timedelta(minutes=20))):
-                    log('need_receipt_compare: transferee_amount:%s = transaction_amount:%s -- holder:%s = name:%s' % (settings.last_transferee.amount, transaction['amount'], settings.last_transferee.holder, transaction['name']), settings.Level.RECEIPT)
+                if settings.last_transferee.amount == "%.2f" % (
+                        float(transaction['amount'])) and settings.last_transferee.holder == transaction['name'] and (
+                        settings.payment_time <= transaction_time < (
+                        settings.payment_time + datetime.timedelta(minutes=20))):
+                    log('need_receipt_compare: transferee_amount:%s = transaction_amount:%s -- holder:%s = name:%s' % (
+                        settings.last_transferee.amount, transaction['amount'], settings.last_transferee.holder,
+                        transaction['name']), settings.Level.RECEIPT)
                     inner = True
                     if transaction['postscript'] == '跨行转账':
                         inner = False
-                    # receipt = Receipt(transaction['time'], transaction['amount'], transaction['name'], transaction[
-                    # 'postscript'], transaction['customerAccount'], inner, transaction['flowNo'], transaction[
-                    # 'sequence'])
-                    api.receipt(params['account_alias'], [{'time': transaction['time'], 'amount': transaction['amount'], 'name': transaction['name'], 'postscript': transaction['postscript'], 'customerAccount': transaction['customerAccount'], 'inner': inner, 'flowNo': transaction['flowNo'], 'sequence': transaction['sequence']}])
+                    settings.receipt = Receipt(transaction['time'], transaction['amount'], transaction['name'],
+                                               transaction[
+                                                   'postscript'], transaction['customerAccount'], inner,
+                                               transaction['flowNo'], transaction[
+                                                   'sequence'])
                     settings.need_receipt = False
             # 改变单位适应水滴
             transaction['amount'] = "%.2f" % (float(transaction['amount']) * 100)
@@ -141,6 +146,13 @@ class BotFactory:
         time.sleep(3)
         self.bank.do_work("back")
         self.doing = False
+        if settings.receipt != '':
+            api.receipt(params['account_alias'], [
+                {'time': settings.receipt.time, 'amount': settings.receipt.amount, 'name': settings.receipt.name,
+                 'postscript': settings.receipt.postscript, 'customerAccount': settings.receipt.customerAccount,
+                 'inner': settings.receipt.inner, 'flowNo': settings.receipt.flowNo,
+                 'sequence': settings.receipt.sequence}])
+            settings.receipt = ''
         return rsp
 
     def cast_last_transaction(self, params):
@@ -151,4 +163,3 @@ class BotFactory:
         api.status(params['account_alias'], settings.Status.RUNNING)
         self.doing = False
         return rsp
-

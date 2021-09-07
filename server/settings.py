@@ -21,7 +21,7 @@ log_msg = ""
 need_receipt = False
 last_transferee = ""
 payment_time = ""
-
+receipt = ''
 with open('../device_id.txt') as fd:
     serial_no = fd.readline().strip()
 
