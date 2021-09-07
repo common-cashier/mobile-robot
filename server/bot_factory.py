@@ -137,23 +137,26 @@ class BotFactory:
                 break
             filter_transaction.append(transaction)
             i += i
-        settings.need_receipt = False
+        time.sleep(1)
+        self.bank.do_work("back")
         if len(filter_transaction) > 0:
             log('transaction_report: ' + str(filter_transaction), settings.Level.RECEIPT_OF_RECEIVE)
             rsp = api.transaction(params['account_alias'], params['balance'], filter_transaction)
             api.status(params['account_alias'], settings.Status.RUNNING)
-        time.sleep(6)
-        self.bank.do_work("back")
-        time.sleep(3)
-        self.bank.do_work("back")
-        self.doing = False
         if settings.receipt != '':
-            api.receipt(params['account_alias'], [
-                {'time': settings.receipt.time, 'amount': settings.receipt.amount, 'name': settings.receipt.name,
-                 'postscript': settings.receipt.postscript, 'customerAccount': settings.receipt.customerAccount,
-                 'inner': settings.receipt.inner, 'flowNo': settings.receipt.flowNo,
-                 'sequence': settings.receipt.sequence}])
+            try:
+                api.receipt(params['account_alias'], [
+                    {'time': settings.receipt.time, 'amount': settings.receipt.amount, 'name': settings.receipt.name,
+                     'postscript': settings.receipt.postscript, 'customerAccount': settings.receipt.customerAccount,
+                     'inner': settings.receipt.inner, 'flowNo': settings.receipt.flowNo,
+                     'sequence': settings.receipt.sequence}])
+            except Exception as ext:
+                log(ext, settings.Level.SYSTEM)
             settings.receipt = ''
+        settings.need_receipt = False
+        self.doing = False
+        time.sleep(1)
+        self.bank.do_work("back")
         return rsp
 
     def cast_last_transaction(self, params):
