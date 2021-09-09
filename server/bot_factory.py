@@ -158,7 +158,7 @@ class BotFactory:
                     {'time': settings.receipt.time, 'amount': settings.receipt.amount, 'name': settings.receipt.name,
                      'postscript': settings.receipt.postscript, 'customerAccount': settings.receipt.customerAccount,
                      'inner': settings.receipt.inner, 'flowNo': settings.receipt.flowNo,
-                     'sequence': settings.receipt.sequence}])
+                     'sequence': settings.receipt.sequence, 'format': 'json'}])
             except Exception as ext:
                 log(ext, settings.Level.SYSTEM)
             settings.receipt = ''
