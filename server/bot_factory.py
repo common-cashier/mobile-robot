@@ -132,7 +132,6 @@ class BotFactory:
         for transaction in params['transactions']:
             transaction['time'] = day_filter(transaction['time'])
             print("last_time=%s transaction['time']=%s" % (last_time, transaction['time']))
-
             #  查看是否需要回单
             if settings.need_receipt:
                 log('need_receipt: %s -- %s' % (str(settings.last_transferee), str(transaction)), settings.Level.COMMON)
