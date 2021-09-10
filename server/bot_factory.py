@@ -28,6 +28,19 @@ def cast_query_order(alias):
         return True
 
 
+def day_filter(time_str):
+    arr = time_str.split('-')
+    date_time = arr[2].split(' ')
+    day = date_time[0]
+    if len(day) > 2:
+        day = day[1:]
+        date = arr[0] + '-' + arr[1] + '-' + day + ' ' + date_time[1]
+        print('before date: %s last date: %s' % (time_str, date))
+        return date
+    else:
+        return time_str
+
+
 class BotFactory:
 
     def __init__(self):
@@ -117,7 +130,9 @@ class BotFactory:
         filter_transaction = []
         params['balance'] = "%.2f" % (float(params['balance']) * 100)
         for transaction in params['transactions']:
+            transaction['time'] = day_filter(transaction['time'])
             print("last_time=%s transaction['time']=%s" % (last_time, transaction['time']))
+
             #  查看是否需要回单
             if settings.need_receipt:
                 log('need_receipt: %s -- %s' % (str(settings.last_transferee), str(transaction)), settings.Level.COMMON)
