@@ -94,9 +94,7 @@ class BotFactory:
             robot = getattr(module, settings.bot.bank.lower())
             self.bank = robot
         if params['do_work'] == "go_to_transfer":
-            print("go_to_transfer")
             if settings.need_receipt_no:
-                print("go_to_receipt")
                 self.bank.do_work('go_to_receipt')
             else:
                 if settings.need_receipt:
@@ -183,7 +181,7 @@ class BotFactory:
         if settings.receipt.name is not None:
             try:
                 api.receipt(params['account_alias'], [
-                    {'time': settings.receipt.time, 'amount': settings.receipt.amount, 'name': settings.receipt.name,
+                    {'time': settings.receipt.time, 'amount': "%.2f" % (float(settings.receipt.amount) * 100), 'name': settings.receipt.name,
                      'postscript': settings.receipt.postscript, 'customerAccount': settings.receipt.customerAccount,
                      'inner': settings.receipt.inner, 'flowNo': settings.receipt.flowNo,
                      'sequence': settings.receipt.sequence, 'format': settings.receipt.format, 'billNo': settings.receipt.billNo}])

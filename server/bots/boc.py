@@ -265,28 +265,32 @@ def input_amount():
 
 
 def go_to_receipt():
-    print("go_to_receipt 转账")
     if self(text="转账").exists(timeout=20):
         self(resourceId="com.chinamworld.bocmbci:id/tv_item", text="转账").click()
         get_receipt()
 
 
 def get_receipt():
-    print("go_to_receipt tv_trans_record")
     if self(resourceId="com.chinamworld.bocmbci:id/tv_trans_record").exists(timeout=20):
         self(resourceId="com.chinamworld.bocmbci:id/tv_trans_record").click()
         try_web()
 
 
+def money_format(amount):
+    res = format(float(amount), ",")
+    if len(res.split('.')[1]) < 2:
+        res = res + '0'
+    return res
+
+
 def try_web():
-    print("go_to_receipt 服务器开小差了，请稍后再试")
     if self(text="服务器开小差了，请稍后再试").exists(timeout=10):
         self.press("back")
         get_receipt()
     else:
         if self(text="近3个月查询结果").exists(timeout=10):
-            if self(text="%s人民币元%s" % (settings.last_transferee.holder, format(float(settings.last_transferee.amount), ","))).exists(timeout=10):
-                self(text="%s人民币元%s" % (settings.last_transferee.holder, format(float(settings.last_transferee.amount), ","))).click()
+            if self(text="%s人民币元%s" % (settings.last_transferee.holder, money_format(settings.last_transferee.amount))).exists(timeout=10):
+                self(text="%s人民币元%s" % (settings.last_transferee.holder, money_format(settings.last_transferee.amount))).click()
                 if self(resourceId="com.chinamworld.bocmbci:id/tv_name", text="人行报文号").exists(timeout=10):
                     bill_no = self(resourceId="com.chinamworld.bocmbci:id/tv_name", text="人行报文号").right(
                         resourceId="com.chinamworld.bocmbci:id/tv_value").get_text()
@@ -305,7 +309,8 @@ def try_web():
                     settings.receipt_no.flowNo = flow_no
                     settings.receipt_no.billNo = bill_no
                     settings.receipt_no.amount = amount.replace(",", '')
-                    settings.log('bill_no: %s account: %s name: %s flow_no: %s time: %s amount: %s' % (bill_no, account, name, flow_no, time, amount), settings.Level.COMMON)
+                    settings.log('bill_no: %s account: %s name: %s flow_no: %s time: %s amount: %s' % (
+                    bill_no, account, name, flow_no, time, amount), settings.Level.COMMON)
                     settings.need_receipt_no = False
                     self.press("back")
                     self.sleep(1)
