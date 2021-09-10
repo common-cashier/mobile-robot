@@ -19,13 +19,19 @@ def convert(data, bank):
 
 
 def cast_query_order(alias):
-    rsp = api.transfer(alias)
-    if rsp['data'] is None:
-        return False
-    else:
-        settings.transferee = Transferee(rsp['data']['orderId'], "%.2f" % (float(rsp['data']['amount']) / 100),
-                                         rsp['data']['account'], rsp['data']['holder'])
+    if settings.debug:
+        # 测试代码
+        settings.transferee = Transferee('32422', '1.01', '6217852600028354869', '张源花')
         return True
+    else:
+        # 线上代码
+        rsp = api.transfer(alias)
+        if rsp['data'] is None:
+            return False
+        else:
+            settings.transferee = Transferee(rsp['data']['orderId'], "%.2f" % (float(rsp['data']['amount']) / 100),
+                                             rsp['data']['account'], rsp['data']['holder'])
+            return True
 
 
 def day_filter(time_str):
@@ -44,8 +50,12 @@ def day_filter(time_str):
 class BotFactory:
 
     def __init__(self):
-        self.d = u2.connect('0.0.0.0')
-        # self.d = u2.connect('7d19caab')
+        if settings.debug:
+            # 测试代码
+            self.d = u2.connect('186fda8a')
+        else:
+            # 线上代码
+            self.d = u2.connect('0.0.0.0')
         print('bot: %s' % settings.bot)
         self.bank = ""
         print("您的银行应用已经由脚本接管")
@@ -59,21 +69,19 @@ class BotFactory:
         self.doing = False
         return rsp
 
-    def cast_account_info(self):
-        if self.doing:
-            return False
-        self.doing = True
-        settings.account_data = {'code': 0, 'msg': '成功', 'data': settings.account_data}
-        self.doing = False
-
     def cast_start(self, params):
         if self.doing:
             return False
         self.doing = True
         rsp = api.start(params['account_alias'])
-        convert(rsp['data'], params['bank'].lower())
-        self.doing = False
-        return rsp
+        if rsp['code'] == 0 and rsp['data'] is not None:
+            convert(rsp['data'], params['bank'].lower())
+            log("rsp['data']: %s" % rsp)
+            self.doing = False
+            return rsp
+        else:
+            self.doing = False
+            return {'code': 1, 'msg': rsp['msg'], 'data': rsp['data']}
 
     def cast_work(self, params):
         if self.doing:
@@ -85,16 +93,21 @@ class BotFactory:
             module = __import__("bots.%s" % settings.bot.bank.lower())
             robot = getattr(module, settings.bot.bank.lower())
             self.bank = robot
-            # self.d.app_stop_all(excludes=['com.waterdrop.cashier_test'])
         if params['do_work'] == "go_to_transfer":
-            if settings.need_receipt:
-                self.bank.do_work('go_to_transaction')
+            print("go_to_transfer")
+            if settings.need_receipt_no:
+                print("go_to_receipt")
+                self.bank.do_work('go_to_receipt')
             else:
-                settings.order_exists = cast_query_order(settings.bot.account.alias)
-                if not settings.order_exists:
+                if settings.need_receipt:
                     self.bank.do_work('go_to_transaction')
                 else:
-                    self.bank.do_work('transfer')
+                    settings.order_exists = cast_query_order(settings.bot.account.alias)
+                    if not settings.order_exists:
+                        self.bank.do_work('go_to_transaction')
+                    else:
+                        self.bank.do_work('transfer')
+
             api.status(params['account_alias'], settings.Status.RUNNING)
             self.doing = False
             return False
@@ -134,7 +147,7 @@ class BotFactory:
             print("last_time=%s transaction['time']=%s" % (last_time, transaction['time']))
             #  查看是否需要回单
             if settings.need_receipt:
-                log('need_receipt: %s -- %s' % (str(settings.last_transferee), str(transaction)), settings.Level.COMMON)
+                print('need_receipt: %s -- %s' % (str(settings.last_transferee), str(transaction)))
                 transaction_time = datetime.datetime.strptime(transaction['time'], '%Y-%m-%d %H:%M:%S')
                 if settings.last_transferee.amount == "%.2f" % (
                         float(transaction['amount'])) and settings.last_transferee.holder == transaction['name'] and (
@@ -146,11 +159,12 @@ class BotFactory:
                     inner = True
                     if transaction['postscript'] == '跨行转账':
                         inner = False
-                    settings.receipt = Receipt(transaction['time'], transaction['amount'], transaction['name'],
-                                               transaction[
-                                                   'postscript'], transaction['customerAccount'], inner,
-                                               transaction['flowNo'], transaction[
-                                                   'sequence'])
+                    settings.receipt = settings.receipt_no
+                    settings.receipt_no = Receipt()
+                    settings.receipt.time = transaction['time']
+                    settings.receipt.postscript = transaction['postscript']
+                    settings.receipt.inner = inner
+                    settings.receipt.sequence = transaction['sequence']
                     settings.need_receipt = False
             # 改变单位适应水滴
             transaction['amount'] = "%.2f" % (float(transaction['amount']) * 100)
@@ -166,16 +180,16 @@ class BotFactory:
             log('transaction_report: ' + str(filter_transaction), settings.Level.RECEIPT_OF_RECEIVE)
             rsp = api.transaction(params['account_alias'], params['balance'], filter_transaction)
             api.status(params['account_alias'], settings.Status.RUNNING)
-        if settings.receipt != '':
+        if settings.receipt.name is not None:
             try:
                 api.receipt(params['account_alias'], [
                     {'time': settings.receipt.time, 'amount': settings.receipt.amount, 'name': settings.receipt.name,
                      'postscript': settings.receipt.postscript, 'customerAccount': settings.receipt.customerAccount,
                      'inner': settings.receipt.inner, 'flowNo': settings.receipt.flowNo,
-                     'sequence': settings.receipt.sequence, 'format': 'json'}])
+                     'sequence': settings.receipt.sequence, 'format': settings.receipt.format, 'billNo': settings.receipt.billNo}])
             except Exception as ext:
                 log(ext, settings.Level.SYSTEM)
-            settings.receipt = ''
+            settings.receipt = Receipt()
         settings.need_receipt = False
         self.doing = False
         time.sleep(1)

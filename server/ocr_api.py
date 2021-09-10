@@ -11,7 +11,8 @@ from tencentcloud.ocr.v20181119 import ocr_client, models
 import ssl
 
 ssl._create_default_https_context = ssl._create_unverified_context
-from settings import log
+from settings import log, Level
+import settings
 
 cred = credential.Credential("AKIDRgfLktkKeiW2HFwMVO1NSGo43lCNHuGL", "pNefQu73i5B1cwzlIYWDdngofGadOu97")
 httpProfile = HttpProfile()
@@ -40,7 +41,7 @@ def ocr_img(img_url, letters_len):
         resp = client.GeneralBasicOCR(req)
 
         resp = resp.to_json_string()
-        log('ocr_from_tencent: ' + resp, '4')
+        log('ocr_from_tencent: ' + resp, Level.EXTERNAL)
         rsp_json = json.loads(resp)
         rsp = ''
         for letters in rsp_json['TextDetections']:
@@ -48,10 +49,12 @@ def ocr_img(img_url, letters_len):
         rsp = re.sub(u"([^\u4e00-\u9fa5\u0030-\u0039\u0041-\u005a\u0061-\u007a])", "", rsp)
         rsp = rsp[0: letters_len]
         # rsp_json_str = resp.to_json_string()
-        log('ocr_img_to: ' + rsp, '4')
+        log('ocr_img_to: ' + rsp, Level.EXTERNAL)
+        settings.read_img_lock = False
         return rsp
 
     except TencentCloudSDKException as err:
+        settings.read_img_lock = False
         print(err)
 
 

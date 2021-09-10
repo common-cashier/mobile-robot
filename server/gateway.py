@@ -1,3 +1,4 @@
+# coding: utf-8
 import json
 import os
 
@@ -107,7 +108,7 @@ def sms():
                 print('/sms rsp: %s ' % rsp)
                 return rsp
             except Exception as ext:
-                ext = {'code': 1, 'msg': str(ext)}
+                ext = {'code': 1, 'msg': ext}
                 print('/sms rsp: %s 需要先启动卡机' % ext)
                 return ext
         except ConnectionRefusedError:
@@ -129,6 +130,8 @@ def start():
             log('/start req: %s' % params)
             settings.api['base'] = params['baseURL']
             params['serialNo'] = settings.serial_no
+            if params['bank'] == 'CCBC':
+                params['bank'] = 'CCB'
             if params['kind'] == '0':
                 if not params['bank'] in settings.receive_bank:
                     res = {"code": 1, 'msg': '收款暂时未支持您所启动的银行，请耐心等待开发！'}
@@ -157,16 +160,18 @@ def start():
             bot_util.cast_transaction = bot_factory.cast_transaction
             bot_util.cast_work = bot_factory.cast_work
             bot_util.cast_start = bot_factory.cast_start
-            bot_util.cast_account_info = bot_factory.cast_account_info
             bot_util.cast_sms = bot_factory.cast_sms
             rsp = bot_util.cast_start(params)
-            rsp['data']['kind'] = params['kind']
-            rsp['data']['devicesId'] = settings.serial_no
-            settings.account_data = rsp['data']
-            # if rsp is None or rsp['code'] != 0:
-            #     return {'code': 1, 'msg': '获取银行卡信息失败'}
-            log("rsp['data']: %s" % rsp)
-            return {'code': 0, 'msg': '启动成功', 'data': rsp['data']}
+            if rsp['code'] == 0 and rsp['data'] is not None:
+                rsp['data']['kind'] = params['kind']
+                rsp['data']['devicesId'] = settings.serial_no
+                settings.account_data = rsp['data']
+                # if rsp is None or rsp['code'] != 0:
+                #     return {'code': 1, 'msg': '获取银行卡信息失败'}
+                log("rsp['data']: %s" % rsp)
+                return {'code': 0, 'msg': '启动成功', 'data': rsp['data']}
+            else:
+                return {'code': 1, 'msg': rsp['msg'], 'data': rsp['data']}
         except ConnectionRefusedError:
             rsp = {'code': 1, 'msg': '服务未开启，请重新运行激活程序！'}
             log(rsp, settings.Level.SYSTEM)
@@ -181,8 +186,7 @@ def start():
 def account_info():
     try:
         print('settings.account_data ---------> %s' % settings.account_data)
-        bot_util.cast_account_info()
-        rsp = settings.account_data
+        rsp = {'code': 0, 'msg': '成功', 'data': settings.account_data}
         log('/account_info rsp: %s' % rsp)
     except ConnectionRefusedError:
         rsp = {'code': 2, 'msg': 'atx未启动，请先插上usb线，运行电脑脚本！'}
@@ -190,7 +194,10 @@ def account_info():
     except Exception as ext:
         rsp = {'code': 1, 'msg': ext}
         log(rsp, settings.Level.SYSTEM)
-    return rsp
+    if not rsp or rsp == '':
+        return {'code': 1, 'msg': '还没获取到信息', 'data': rsp}
+    else:
+        return rsp
 
 
 @app.route('/do_work', methods=['POST'])

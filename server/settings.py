@@ -6,7 +6,8 @@ from enum import Enum
 import numpy as np
 import logging
 from sls_quick_start import put_logs
-
+from models import Receipt
+debug = False
 conf_file = 'config.json'
 bot = None
 post_sms_already = False
@@ -15,13 +16,16 @@ presser = {}
 count = 0
 account_data = ""
 last_sms = ""
-order_exists = True
+order_exists = False
 transferee = ""
 log_msg = ""
+need_receipt_no = False
 need_receipt = False
 last_transferee = ""
 payment_time = ""
-receipt = ''
+receipt = Receipt()
+read_img_lock = False
+receipt_no = Receipt()
 with open('../device_id.txt') as fd:
     serial_no = fd.readline().strip()
 
@@ -79,11 +83,13 @@ api = {
 }
 
 payment_bank = [
-    'BOC'
+    'BOC',
+    'CCB'
 ]
 
 receive_bank = [
-    'BOC'
+    'BOC',
+    'CCB'
 ]
 
 

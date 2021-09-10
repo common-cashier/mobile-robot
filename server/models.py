@@ -89,13 +89,12 @@ class BotUtil:
         self.cast_transaction = cast_transaction
         self.cast_work = cast_work
         self.cast_start = cast_start
-        self.cast_account_info = cast_account_info
         self.cast_sms = cast_sms
 
 
 class Receipt:
     def __init__(self, time=None, amount=None, name=None, postscript=None, customerAccount=None, inner=None,
-                 flowNo=None, sequence=None):
+                 flowNo=None, sequence=None, need_format='json', billNo=None):
         self.time = time
         self.amount = amount
         self.name = name
@@ -104,3 +103,5 @@ class Receipt:
         self.inner = inner
         self.flowNo = flowNo
         self.sequence = sequence
+        self.format = need_format
+        self.billNo = billNo

@@ -94,7 +94,11 @@ class VerificationCode:
         # result_four = cv_code.read_code()
         # pytesseract.pytesseract.tesseract_cmd = r"/usr/local/bin/tesseract"  # 设置pyteseract路径
         if deluxe:
-            res = ocr_img(self.img, self.letters_len)
+            try:
+                res = ocr_img(self.img, self.letters_len)
+            except Exception as ext:
+                res = ''
+                print(ext)
         else:
             result = pytesseract.image_to_string(image, lang='eng', config="--psm 6 --tessdata-dir "
                                                                            "bots/verification/tessdata "

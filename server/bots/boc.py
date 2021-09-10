@@ -6,6 +6,7 @@ sys.path.append("..")
 import api
 import settings
 from bots.verification.verification_code import VerificationCode
+from models import Transferee
 
 package = 'com.chinamworld.bocmbci'
 activity = 'com.boc.bocsoft.mobile.bocmobile.buss.system.main.ui.MainActivity'
@@ -154,12 +155,12 @@ def transfer():
                 self(resourceId="com.chinamworld.bocmbci:id/tv_number").click()
                 if self(resourceId="com.chinamworld.bocmbci:id/txt_money_title").exists(timeout=10):
                     input_amount()
-                    self(resourceId="com.chinamworld.bocmbci:id/trans_remit_payeename").click()
-                    self.send_keys(settings.transferee.holder, clear=True)
-                    self.sleep(2)
                     self(resourceId="com.chinamworld.bocmbci:id/clear_edit_context").click()
                     self.send_keys(settings.transferee.account, clear=True)
-                    self.sleep(2)
+                    self.sleep(3)
+                    self(resourceId="com.chinamworld.bocmbci:id/trans_remit_payeename").click()
+                    self.send_keys(settings.transferee.holder, clear=True)
+                    self.sleep(3)
                     if self(resourceId="com.chinamworld.bocmbci:id/choice_data_arrow", description="点击更换收款银行").exists(
                             timeout=5):
                         self.sleep(2)
@@ -197,8 +198,10 @@ def input_sms(sms):
         self.sleep(1)
         api.transfer_result(settings.transferee.order_id, True)
         settings.log("payment: 付款成功 %s" % str(settings.transferee), settings.Level.RECEIPT_OF_PAYMENT)
+        settings.need_receipt_no = True
         settings.need_receipt = True
         settings.last_transferee = settings.transferee
+        settings.transferee = ''
         self.sleep(5)
         self(resourceId="com.chinamworld.bocmbci:id/btn_home").click()
     else:
@@ -261,6 +264,67 @@ def input_amount():
     self.sleep(3)
 
 
+def go_to_receipt():
+    print("go_to_receipt 转账")
+    if self(text="转账").exists(timeout=20):
+        self(resourceId="com.chinamworld.bocmbci:id/tv_item", text="转账").click()
+        get_receipt()
+
+
+def get_receipt():
+    print("go_to_receipt tv_trans_record")
+    if self(resourceId="com.chinamworld.bocmbci:id/tv_trans_record").exists(timeout=20):
+        self(resourceId="com.chinamworld.bocmbci:id/tv_trans_record").click()
+        try_web()
+
+
+def try_web():
+    print("go_to_receipt 服务器开小差了，请稍后再试")
+    if self(text="服务器开小差了，请稍后再试").exists(timeout=10):
+        self.press("back")
+        get_receipt()
+    else:
+        if self(text="近3个月查询结果").exists(timeout=10):
+            if self(text="%s人民币元%s" % (settings.last_transferee.holder, settings.last_transferee.amount)).exists(timeout=10):
+                self(text="%s人民币元%s" % (settings.last_transferee.holder, settings.last_transferee.amount)).click()
+                if self(resourceId="com.chinamworld.bocmbci:id/tv_name", text="人行报文号").exists(timeout=10):
+                    bill_no = self(resourceId="com.chinamworld.bocmbci:id/tv_name", text="人行报文号").right(
+                        resourceId="com.chinamworld.bocmbci:id/tv_value").get_text()
+                    name = self(resourceId="com.chinamworld.bocmbci:id/tv_name", text="收款人名称").right(
+                        resourceId="com.chinamworld.bocmbci:id/tv_value").get_text()
+                    account = self(resourceId="com.chinamworld.bocmbci:id/tv_name", text="收款账号").right(
+                        resourceId="com.chinamworld.bocmbci:id/tv_value").get_text()
+                    flow_no = self(resourceId="com.chinamworld.bocmbci:id/tv_name", text="交易序号").right(
+                        resourceId="com.chinamworld.bocmbci:id/tv_value").get_text()
+                    time = self(resourceId="com.chinamworld.bocmbci:id/tv_name", text="交易日期").right(
+                        resourceId="com.chinamworld.bocmbci:id/tv_value").get_text()
+                    amount = self(resourceId="com.chinamworld.bocmbci:id/tv_sum").get_text()
+                    settings.receipt_no.time = time
+                    settings.receipt_no.name = name
+                    settings.receipt_no.customerAccount = account
+                    settings.receipt_no.flowNo = flow_no
+                    settings.receipt_no.billNo = bill_no
+                    settings.receipt_no.amount = amount
+                    settings.log('bill_no: %s account: %s name: %s flow_no: %s time: %s amount: %s' % (bill_no, account, name, flow_no, time, amount), settings.Level.COMMON)
+                    settings.need_receipt_no = False
+                    self.press("back")
+                    self.sleep(1)
+                    self.press("back")
+                    self.sleep(1)
+                    self.press("back")
+                    self.sleep(1)
+                else:
+                    self.press("back")
+                    self.press("back")
+                    get_receipt()
+            else:
+                self.press("back")
+                get_receipt()
+        else:
+            self.press("back")
+            get_receipt()
+
+
 def do_work(task_name):
     if task_name == "input_pwd":
         input_pwd()
@@ -274,3 +338,5 @@ def do_work(task_name):
         self.press("back")
     if task_name == "transfer":
         transfer()
+    if task_name == 'go_to_receipt':
+        go_to_receipt()
