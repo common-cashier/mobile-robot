@@ -285,8 +285,8 @@ def try_web():
         get_receipt()
     else:
         if self(text="近3个月查询结果").exists(timeout=10):
-            if self(text="%s人民币元%s" % (settings.last_transferee.holder, settings.last_transferee.amount)).exists(timeout=10):
-                self(text="%s人民币元%s" % (settings.last_transferee.holder, settings.last_transferee.amount)).click()
+            if self(text="%s人民币元%s" % (settings.last_transferee.holder, format(float(settings.last_transferee.amount), ","))).exists(timeout=10):
+                self(text="%s人民币元%s" % (settings.last_transferee.holder, format(float(settings.last_transferee.amount), ","))).click()
                 if self(resourceId="com.chinamworld.bocmbci:id/tv_name", text="人行报文号").exists(timeout=10):
                     bill_no = self(resourceId="com.chinamworld.bocmbci:id/tv_name", text="人行报文号").right(
                         resourceId="com.chinamworld.bocmbci:id/tv_value").get_text()
@@ -304,7 +304,7 @@ def try_web():
                     settings.receipt_no.customerAccount = account
                     settings.receipt_no.flowNo = flow_no
                     settings.receipt_no.billNo = bill_no
-                    settings.receipt_no.amount = amount
+                    settings.receipt_no.amount = amount.replace(",", '')
                     settings.log('bill_no: %s account: %s name: %s flow_no: %s time: %s amount: %s' % (bill_no, account, name, flow_no, time, amount), settings.Level.COMMON)
                     settings.need_receipt_no = False
                     self.press("back")
