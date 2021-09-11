@@ -290,9 +290,9 @@ def try_web():
     else:
         if self(text="近3个月查询结果").exists(timeout=10):
             if self(text="%s人民币元%s" % (
-            settings.last_transferee.holder, money_format(settings.last_transferee.amount))).exists(timeout=10):
+                    settings.last_transferee.holder, money_format(settings.last_transferee.amount))).exists(timeout=10):
                 self(text="%s人民币元%s" % (
-                settings.last_transferee.holder, money_format(settings.last_transferee.amount))).click()
+                    settings.last_transferee.holder, money_format(settings.last_transferee.amount))).click()
                 if self(resourceId="com.chinamworld.bocmbci:id/tv_name", text="交易序号").exists(timeout=10):
                     flow_no = self(resourceId="com.chinamworld.bocmbci:id/tv_name", text="交易序号").right(
                         resourceId="com.chinamworld.bocmbci:id/tv_value").get_text()
