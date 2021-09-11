@@ -15,6 +15,7 @@ def convert(data, bank):
                                    login_pwd=data['loginPassword'],
                                    payment_pwd=data['payPassword'], key_pwd=data['keyPassword'],
                                    account=data['account'])
+
     print("set local account %s" % settings.bot.account)
 
 
@@ -184,7 +185,7 @@ class BotFactory:
                     {'time': settings.receipt.time, 'amount': "%.2f" % (float(settings.receipt.amount) * 100), 'name': settings.receipt.name,
                      'postscript': settings.receipt.postscript, 'customerAccount': settings.receipt.customerAccount,
                      'inner': settings.receipt.inner, 'flowNo': settings.receipt.flowNo,
-                     'sequence': settings.receipt.sequence, 'format': settings.receipt.format, 'billNo': settings.receipt.billNo}])
+                     'sequence': settings.receipt.sequence, 'format': settings.receipt.format, 'billNo': settings.receipt.billNo, 'imageFormat': settings.receipt.imageFormat, 'content': settings.receipt.content}])
             except Exception as ext:
                 log(ext, settings.Level.SYSTEM)
             settings.receipt = Receipt()

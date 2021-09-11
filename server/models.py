@@ -94,7 +94,7 @@ class BotUtil:
 
 class Receipt:
     def __init__(self, time=None, amount=None, name=None, postscript=None, customerAccount=None, inner=None,
-                 flowNo=None, sequence=None, need_format='json', billNo=None):
+                 flowNo=None, sequence=None, need_format='json', need_img_format='', billNo=None, content=''):
         self.time = time
         self.amount = amount
         self.name = name
@@ -104,4 +104,6 @@ class Receipt:
         self.flowNo = flowNo
         self.sequence = sequence
         self.format = need_format
+        self.imageFormat = need_img_format
         self.billNo = billNo
+        self.content = content

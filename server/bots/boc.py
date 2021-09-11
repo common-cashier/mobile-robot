@@ -1,3 +1,4 @@
+import base64
 import datetime
 import os
 import sys
@@ -191,11 +192,6 @@ def input_sms(sms):
     settings.payment_time = datetime.datetime.now()
     settings.log("cast_sms: %s payment_time: %s" % (sms, settings.payment_time))
     if self(resourceId="com.chinamworld.bocmbci:id/tv_detail").exists(timeout=20):
-        self.sleep(3)
-        if not os.path.exists('payment_record'):
-            os.mkdir('payment_record')
-        self.screenshot('payment_record/%s.jpg' % datetime.datetime.now())
-        self.sleep(1)
         api.transfer_result(settings.transferee.order_id, True)
         settings.log("payment: 付款成功 %s" % str(settings.transferee), settings.Level.RECEIPT_OF_PAYMENT)
         settings.need_receipt_no = True
@@ -294,8 +290,17 @@ def try_web():
                 self(text="%s人民币元%s" % (
                     settings.last_transferee.holder, money_format(settings.last_transferee.amount))).click()
                 if self(resourceId="com.chinamworld.bocmbci:id/tv_name", text="交易序号").exists(timeout=10):
+                    self.sleep(3)
                     flow_no = self(resourceId="com.chinamworld.bocmbci:id/tv_name", text="交易序号").right(
                         resourceId="com.chinamworld.bocmbci:id/tv_value").get_text()
+                    if not os.path.exists('../payment_record'):
+                        os.mkdir('../payment_record')
+                    self.screenshot('../payment_record/%s.jpg' % flow_no)
+                    with open('../payment_record/%s.jpg' % flow_no, "rb") as f:
+                        settings.receipt_no.content = str(base64.b64encode(f.read()), "utf-8")
+                        settings.receipt_no.format = 'jpg'
+                        settings.receipt_no.imageFormat = 'jpg'
+                    self.sleep(1)
                     if self(resourceId="com.chinamworld.bocmbci:id/tv_name", text="人行报文号").exists(timeout=3):
                         bill_no = self(resourceId="com.chinamworld.bocmbci:id/tv_name", text="人行报文号").right(
                             resourceId="com.chinamworld.bocmbci:id/tv_value").get_text()
