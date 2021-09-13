@@ -333,6 +333,15 @@ def try_web():
                     self.press("back")
                     get_receipt()
             else:
+                if self(text="%s交易失败人民币元%s" % (
+                        settings.last_transferee.holder, money_format(settings.last_transferee.amount))).exists(timeout=10):
+                    settings.need_receipt_no = False
+                    settings.need_receipt = False
+                    self.press("back")
+                    self.sleep(1)
+                    self.press("back")
+                    self.sleep(1)
+                    return False
                 self.press("back")
                 get_receipt()
         else:
