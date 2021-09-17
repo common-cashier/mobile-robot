@@ -75,26 +75,26 @@ def go_to_receipt():
                 resourceId="com.chinamworld.main:id/overseas_transfer_confrim_name").get_text()
             inner = len(postscript.split("他行")) <= 1
             transaction_time = datetime.datetime.strptime(time, '%Y-%m-%d %H:%M:%S')
-            if settings.last_transferee.amount == "%.2f" % (
-                    float(amount)) and settings.last_transferee.holder == name and (
-                    settings.payment_time <= transaction_time < (
-                    settings.payment_time + datetime.timedelta(minutes=20))):
-                settings.receipt.time = time
-                settings.receipt.billNo = bill_no
-                settings.receipt.postscript = postscript
-                settings.receipt.amount = amount
-                settings.receipt.customerAccount = customer_account
-                settings.receipt.name = name
-                settings.receipt.inner = inner
-                if not os.path.exists('../payment_record'):
-                    os.mkdir('../payment_record')
-                self.screenshot('../payment_record/%s.jpg' % settings.receipt.billNo)
-                with open('../payment_record/%s.jpg' % settings.receipt.billNo, "rb") as f:
-                    settings.receipt.content = str(base64.b64encode(f.read()), "utf-8")
-                    settings.receipt.format = 'jpg'
-                    settings.receipt.imageFormat = 'jpg'
-                    params = {'account_alias': settings.bot.account.alias}
-                    report_receipt(params)
+            # if settings.last_transferee.amount == "%.2f" % (
+            #         float(amount)) and settings.last_transferee.holder == name and (
+            #         settings.payment_time <= transaction_time < (
+            #         settings.payment_time + datetime.timedelta(minutes=20))):
+            settings.receipt.time = time
+            settings.receipt.billNo = bill_no
+            settings.receipt.postscript = postscript
+            settings.receipt.amount = amount
+            settings.receipt.customerAccount = customer_account
+            settings.receipt.name = name
+            settings.receipt.inner = inner
+            if not os.path.exists('../payment_record'):
+                os.mkdir('../payment_record')
+            self.screenshot('../payment_record/%s.jpg' % settings.receipt.billNo)
+            with open('../payment_record/%s.jpg' % settings.receipt.billNo, "rb") as f:
+                settings.receipt.content = str(base64.b64encode(f.read()), "utf-8")
+                settings.receipt.format = 'jpg'
+                settings.receipt.imageFormat = 'jpg'
+                params = {'account_alias': settings.bot.account.alias}
+                report_receipt(params)
             settings.need_receipt_no = False
             self.sleep(1)
             self.press("back")
