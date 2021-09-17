@@ -109,6 +109,11 @@ def go_to_transaction():
     self.wait_activity("com.ccb.myaccount.plusview.activity.MyAccountPlusMainActivity", timeout=30)
     if self(resourceId="com.chinamworld.main:id/my_account_detail").exists(timeout=40):
         self(resourceId="com.chinamworld.main:id/my_account_detail").click()
+    else:
+        if self(resourceId="com.chinamworld.main:id/detail").exists(timeout=10):
+            self.sleep(1)
+            self.press("back")
+            return
     if self(resourceId="com.chinamworld.main:id/dlg_right_tv").exists(timeout=15):
         self(resourceId="com.chinamworld.main:id/dlg_right_tv").click()
         self.sleep(1)
@@ -295,9 +300,7 @@ def input_sms(sms):
 def check_success():
     self.wait_activity("com.ccb.framework.security.base.successpage.CcbSuccessPageAct", timeout=20)
     if self(resourceId="com.chinamworld.main:id/tv_expand_text").exists(timeout=10):
-        if not os.path.exists('payment_record'):
-            os.mkdir('payment_record')
-        self.screenshot('payment_record/%s.jpg' % datetime.datetime.now())
+        settings.payment_time = datetime.datetime.now()
         self.sleep(1)
         self(resourceId="com.chinamworld.main:id/title_right_view_container").click()
         api.transfer_result(settings.transferee.order_id, True)
