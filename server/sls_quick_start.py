@@ -1,12 +1,30 @@
 # coding: utf-8
+import json
+import os
+
 from aliyun.log import LogClient, PutLogsRequest, LogItem, GetLogsRequest, IndexConfig
 import time
 
 # 配置AccessKey、服务入口、Project名称、Logstore名称等相关信息。
 # 阿里云访问密钥AccessKey。更多信息，请参见访问密钥。
 # 阿里云账号AccessKey拥有所有API的访问权限，风险很高。强烈建议您创建并使用RAM用户进行API访问或日常运维。
-accessKeyId = "LTAI5tMLmuYBuq55scHkjCYS"
-accessKey = "XP3DeREQrf8tIDaSWUAmqLVeqsstzT"
+third_party_api = {
+    "accessKeyId": "",
+    "accessKey": "",
+    "SecretId": "",
+    "SecretKey": ""
+}
+
+if os.path.exists('../config.json'):
+    with open('../config.json', 'r') as conf:
+        config = json.loads(conf.read())
+        third_party_api['accessKeyId'] = config['accessKeyId']
+        third_party_api['accessKey'] = config['accessKey']
+        third_party_api['SecretId'] = config['SecretId']
+        third_party_api['SecretKey'] = config['SecretKey']
+
+accessKeyId = third_party_api['accessKeyId']
+accessKey = third_party_api['accessKey']
 # 日志服务的域名。更多信息，请参见服务入口。此处以杭州为例，其它地域请根据实际情况填写。
 endpoint = "cn-hongkong.log.aliyuncs.com"
 

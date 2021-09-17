@@ -1,6 +1,7 @@
 # coding: utf-8
 import json
 import base64
+import os
 import re
 
 from tencentcloud.common import credential
@@ -9,12 +10,13 @@ from tencentcloud.common.profile.http_profile import HttpProfile
 from tencentcloud.common.exception.tencent_cloud_sdk_exception import TencentCloudSDKException
 from tencentcloud.ocr.v20181119 import ocr_client, models
 import ssl
-
-ssl._create_default_https_context = ssl._create_unverified_context
 from settings import log, Level
 import settings
+from sls_quick_start import third_party_api
 
-cred = credential.Credential("AKIDRgfLktkKeiW2HFwMVO1NSGo43lCNHuGL", "pNefQu73i5B1cwzlIYWDdngofGadOu97")
+ssl._create_default_https_context = ssl._create_unverified_context
+
+cred = credential.Credential(third_party_api['SecretId'], third_party_api['SecretKey'])
 httpProfile = HttpProfile()
 httpProfile.endpoint = "ocr.tencentcloudapi.com"
 

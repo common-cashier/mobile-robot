@@ -9,7 +9,6 @@ from sls_quick_start import put_logs
 from models import Receipt
 
 debug = False
-conf_file = 'config.json'
 bot = None
 post_sms_already = False
 pc_url = ""
