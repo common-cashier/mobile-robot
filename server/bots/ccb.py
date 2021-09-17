@@ -57,7 +57,7 @@ def go_to_receipt():
     self.wait_activity("com.ccb.transfer.transferhomenew.view.TransferHomeActNew", timeout=20)
     self(text="转账记录").click()
     self.wait_activity("com.ccb.transfer.transferrecord.view.TransferRecordMainActivity", timeout=30)
-    if self(className='android.widget.LinearLayout', index="0").exists(timeout=40):
+    if self(className='android.widget.LinearLayout', index="0").exists(timeout=30):
         self(className='android.widget.LinearLayout', index="0").click()
         if self(text="交易时间").exists(timeout=20):
             time = self(text="交易时间").right(resourceId="com.chinamworld.main:id"
@@ -107,7 +107,7 @@ def go_to_receipt():
 def go_to_transaction():
     self(resourceId="com.chinamworld.main:id/text_item", text="账户").click()
     self.wait_activity("com.ccb.myaccount.plusview.activity.MyAccountPlusMainActivity", timeout=30)
-    if self(resourceId="com.chinamworld.main:id/my_account_detail").exists(timeout=40):
+    if self(resourceId="com.chinamworld.main:id/my_account_detail").exists(timeout=30):
         self(resourceId="com.chinamworld.main:id/my_account_detail").click()
     else:
         if self(resourceId="com.chinamworld.main:id/detail").exists(timeout=10):
