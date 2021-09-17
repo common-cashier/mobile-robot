@@ -7,6 +7,7 @@ import numpy as np
 import logging
 from sls_quick_start import put_logs
 from models import Receipt
+
 debug = False
 conf_file = 'config.json'
 bot = None
@@ -26,6 +27,13 @@ payment_time = ""
 receipt = Receipt()
 read_img_lock = False
 receipt_no = Receipt()
+total_transaction = []
+check_transaction = False
+last_transaction_list = []
+got_transaction = []
+temp_transaction = []
+middle_break = False
+
 with open('../device_id.txt') as fd:
     serial_no = fd.readline().strip()
 
@@ -139,7 +147,6 @@ class MyEncoder(json.JSONEncoder):
             return obj.tolist()
         else:
             return super(MyEncoder, self).default(obj)
-
 
 
 def logger_config(log_path, logging_name):

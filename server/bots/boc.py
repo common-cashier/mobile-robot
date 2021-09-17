@@ -7,7 +7,6 @@ sys.path.append("..")
 import api
 import settings
 from bots.verification.verification_code import VerificationCode
-from models import Transferee
 
 package = 'com.chinamworld.bocmbci'
 activity = 'com.boc.bocsoft.mobile.bocmobile.buss.system.main.ui.MainActivity'

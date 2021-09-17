@@ -22,8 +22,8 @@ def convert(data, bank):
 def cast_query_order(alias):
     if settings.debug:
         # 测试代码
-        settings.transferee = Transferee('32422', '1.01', '6217852600028354869', '张源花')
-        return True
+        # settings.transferee = Transferee('32422', '1.01', '6217852600028354869', '张源花')
+        return False
     else:
         # 线上代码
         rsp = api.transfer(alias)
@@ -33,6 +33,75 @@ def cast_query_order(alias):
             settings.transferee = Transferee(rsp['data']['orderId'], "%.2f" % (float(rsp['data']['amount']) / 100),
                                              rsp['data']['account'], rsp['data']['holder'])
             return True
+
+
+def report_transaction(params):
+    last = api.last_transaction(params['account_alias'])
+    last_time = last['data']['time']
+    print("<<<<<-------------->>>>>>> %s" % last_time)
+    i = 0
+    filter_transaction = []
+    params['balance'] = "%.2f" % (float(params['balance']) * 100)
+    for transaction in params['transactions']:
+        transaction['time'] = day_filter(transaction['time'])
+        print("last_time=%s transaction['time']=%s" % (last_time, transaction['time']))
+        #  查看是否需要回单
+        if settings.need_receipt and settings.bot.bank == 'BOC':
+            filter_receipt(transaction)
+        # 改变单位适应水滴
+        transaction['amount'] = "%.2f" % (float(transaction['amount']) * 100)
+        transaction['balance'] = "%.2f" % (float(transaction['balance']) * 100)
+        # 查看服务器最后一条
+        if transaction['time'] == last_time and transaction['amount'] == "%.2f" % (float(last['data']['amount'])):
+            break
+        filter_transaction.append(transaction)
+        i += i
+    time.sleep(1)
+    if len(filter_transaction) > 0:
+        log('transaction_report: ' + str(filter_transaction), settings.Level.RECEIPT_OF_RECEIVE)
+        api.transaction(params['account_alias'], params['balance'], filter_transaction)
+        api.status(params['account_alias'], settings.Status.RUNNING)
+    if settings.bot.bank == 'BOC':
+        report_receipt(params)
+
+
+def filter_receipt(transaction):
+    print('need_receipt: %s -- %s' % (str(settings.last_transferee), str(transaction)))
+    transaction_time = datetime.datetime.strptime(transaction['time'], '%Y-%m-%d %H:%M:%S')
+    if settings.last_transferee.amount == "%.2f" % (
+            float(transaction['amount'])) and settings.last_transferee.holder == transaction['name'] and (
+            settings.payment_time <= transaction_time < (
+            settings.payment_time + datetime.timedelta(minutes=20))):
+        log('need_receipt_compare: transferee_amount:%s = transaction_amount:%s -- holder:%s = name:%s' % (
+            settings.last_transferee.amount, transaction['amount'], settings.last_transferee.holder,
+            transaction['name']), settings.Level.RECEIPT)
+        inner = True
+        if transaction['postscript'] == '跨行转账':
+            inner = False
+        settings.receipt = settings.receipt_no
+        settings.receipt_no = Receipt()
+        settings.receipt.time = transaction['time']
+        settings.receipt.postscript = transaction['postscript']
+        settings.receipt.inner = inner
+        settings.receipt.sequence = transaction['sequence']
+        settings.need_receipt = False
+
+
+def report_receipt(params):
+    if settings.receipt.name is not None:
+        try:
+            api.receipt(params['account_alias'], [
+                {'time': settings.receipt.time, 'amount': "%.2f" % (float(settings.receipt.amount) * 100),
+                 'name': settings.receipt.name,
+                 'postscript': settings.receipt.postscript, 'customerAccount': settings.receipt.customerAccount,
+                 'inner': settings.receipt.inner, 'flowNo': settings.receipt.flowNo,
+                 'sequence': settings.receipt.sequence, 'format': settings.receipt.format,
+                 'billNo': settings.receipt.billNo, 'imageFormat': settings.receipt.imageFormat,
+                 'content': settings.receipt.content}])
+        except Exception as ext:
+            log(ext, settings.Level.SYSTEM)
+        settings.receipt = Receipt()
+    settings.need_receipt = False
 
 
 def day_filter(time_str):
@@ -53,7 +122,7 @@ class BotFactory:
     def __init__(self):
         if settings.debug:
             # 测试代码
-            self.d = u2.connect('186fda8a')
+            self.d = u2.connect('7d19caab')
         else:
             # 线上代码
             self.d = u2.connect('0.0.0.0')
@@ -101,8 +170,7 @@ class BotFactory:
                 if settings.need_receipt:
                     self.bank.do_work('go_to_transaction')
                 else:
-                    settings.order_exists = cast_query_order(settings.bot.account.alias)
-                    if not settings.order_exists:
+                    if not cast_query_order(settings.bot.account.alias):
                         self.bank.do_work('go_to_transaction')
                     else:
                         self.bank.do_work('transfer')
@@ -135,62 +203,10 @@ class BotFactory:
         if self.doing:
             return False
         self.doing = True
-        last = api.last_transaction(params['account_alias'])
-        last_time = last['data']['time']
-        print("<<<<<-------------->>>>>>> %s" % last_time)
-        i = 0
-        filter_transaction = []
-        params['balance'] = "%.2f" % (float(params['balance']) * 100)
-        for transaction in params['transactions']:
-            transaction['time'] = day_filter(transaction['time'])
-            print("last_time=%s transaction['time']=%s" % (last_time, transaction['time']))
-            #  查看是否需要回单
-            if settings.need_receipt:
-                print('need_receipt: %s -- %s' % (str(settings.last_transferee), str(transaction)))
-                transaction_time = datetime.datetime.strptime(transaction['time'], '%Y-%m-%d %H:%M:%S')
-                if settings.last_transferee.amount == "%.2f" % (
-                        float(transaction['amount'])) and settings.last_transferee.holder == transaction['name'] and (
-                        settings.payment_time <= transaction_time < (
-                        settings.payment_time + datetime.timedelta(minutes=20))):
-                    log('need_receipt_compare: transferee_amount:%s = transaction_amount:%s -- holder:%s = name:%s' % (
-                        settings.last_transferee.amount, transaction['amount'], settings.last_transferee.holder,
-                        transaction['name']), settings.Level.RECEIPT)
-                    inner = True
-                    if transaction['postscript'] == '跨行转账':
-                        inner = False
-                    settings.receipt = settings.receipt_no
-                    settings.receipt_no = Receipt()
-                    settings.receipt.time = transaction['time']
-                    settings.receipt.postscript = transaction['postscript']
-                    settings.receipt.inner = inner
-                    settings.receipt.sequence = transaction['sequence']
-                    settings.need_receipt = False
-            # 改变单位适应水滴
-            transaction['amount'] = "%.2f" % (float(transaction['amount']) * 100)
-            transaction['balance'] = "%.2f" % (float(transaction['balance']) * 100)
-            # 查看服务器最后一条
-            if transaction['time'] == last_time:
-                break
-            filter_transaction.append(transaction)
-            i += i
+        report_transaction(params)
+        self.doing = False
         time.sleep(1)
         self.bank.do_work("back")
-        if len(filter_transaction) > 0:
-            log('transaction_report: ' + str(filter_transaction), settings.Level.RECEIPT_OF_RECEIVE)
-            rsp = api.transaction(params['account_alias'], params['balance'], filter_transaction)
-            api.status(params['account_alias'], settings.Status.RUNNING)
-        if settings.receipt.name is not None:
-            try:
-                api.receipt(params['account_alias'], [
-                    {'time': settings.receipt.time, 'amount': "%.2f" % (float(settings.receipt.amount) * 100), 'name': settings.receipt.name,
-                     'postscript': settings.receipt.postscript, 'customerAccount': settings.receipt.customerAccount,
-                     'inner': settings.receipt.inner, 'flowNo': settings.receipt.flowNo,
-                     'sequence': settings.receipt.sequence, 'format': settings.receipt.format, 'billNo': settings.receipt.billNo, 'imageFormat': settings.receipt.imageFormat, 'content': settings.receipt.content}])
-            except Exception as ext:
-                log(ext, settings.Level.SYSTEM)
-            settings.receipt = Receipt()
-        settings.need_receipt = False
-        self.doing = False
         time.sleep(1)
         self.bank.do_work("back")
         return rsp
