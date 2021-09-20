@@ -46,7 +46,7 @@ def report_transaction(params):
         transaction['time'] = day_filter(transaction['time'])
         print("last_time=%s transaction['time']=%s" % (last_time, transaction['time']))
         #  查看是否需要回单
-        if settings.need_receipt and settings.bot.bank == 'BOC':
+        if settings.need_receipt and settings.bot.bank.lower() == 'boc':
             filter_receipt(transaction)
         # 改变单位适应水滴
         transaction['amount'] = "%.2f" % (float(transaction['amount']) * 100)
@@ -61,7 +61,7 @@ def report_transaction(params):
         log('transaction_report: ' + str(filter_transaction), settings.Level.RECEIPT_OF_RECEIVE)
         api.transaction(params['account_alias'], params['balance'], filter_transaction)
         api.status(params['account_alias'], settings.Status.RUNNING)
-    if settings.bot.bank == 'BOC':
+    if settings.bot.bank.lower() == 'boc':
         report_receipt(params)
 
 
@@ -170,7 +170,8 @@ class BotFactory:
                 if settings.need_receipt:
                     self.bank.do_work('go_to_transaction')
                 else:
-                    if not cast_query_order(settings.bot.account.alias):
+                    query_order = cast_query_order(settings.bot.account.alias)
+                    if not query_order:
                         self.bank.do_work('go_to_transaction')
                     else:
                         self.bank.do_work('transfer')
