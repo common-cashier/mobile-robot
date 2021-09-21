@@ -105,8 +105,8 @@ def go_to_receipt():
 
 
 def go_to_transaction():
-    if self(resourceId="com.chinamworld.main:id/text_item", text="账户").exists(timeout=30):
-        self(resourceId="com.chinamworld.main:id/text_item", text="账户").click()
+    if self(text="账户").exists(timeout=30):
+        self(text="账户").click()
         self.wait_activity("com.ccb.myaccount.plusview.activity.MyAccountPlusMainActivity", timeout=30)
         if self(resourceId="com.chinamworld.main:id/my_account_detail").exists(timeout=30):
             self(resourceId="com.chinamworld.main:id/my_account_detail").click()
