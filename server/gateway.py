@@ -209,8 +209,6 @@ def do_work():
             if params['do_work'] == "stop":
                 if params['extension'] is not None and params['extension'] != '':
                     settings.api['base'] = params['extension']
-                    api.status(params['account_alias'], settings.Status.IDLE)
-                    return {'code': 0, 'msg': '卡机状态已经上报！'}
                 api.status(params['account_alias'], settings.Status.IDLE)
             if bot_util.cast_work is None:
                 return {'code': 1, 'msg': '请先启动卡机！'}
