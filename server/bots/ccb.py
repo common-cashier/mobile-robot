@@ -105,35 +105,36 @@ def go_to_receipt():
 
 
 def go_to_transaction():
-    self(resourceId="com.chinamworld.main:id/text_item", text="账户").click()
-    self.wait_activity("com.ccb.myaccount.plusview.activity.MyAccountPlusMainActivity", timeout=30)
-    if self(resourceId="com.chinamworld.main:id/my_account_detail").exists(timeout=30):
-        self(resourceId="com.chinamworld.main:id/my_account_detail").click()
-    else:
-        if self(resourceId="com.chinamworld.main:id/detail").exists(timeout=10):
+    if self(resourceId="com.chinamworld.main:id/text_item", text="账户").exists(timeout=30):
+        self(resourceId="com.chinamworld.main:id/text_item", text="账户").click()
+        self.wait_activity("com.ccb.myaccount.plusview.activity.MyAccountPlusMainActivity", timeout=30)
+        if self(resourceId="com.chinamworld.main:id/my_account_detail").exists(timeout=30):
+            self(resourceId="com.chinamworld.main:id/my_account_detail").click()
+        else:
+            if self(resourceId="com.chinamworld.main:id/detail").exists(timeout=10):
+                self.sleep(1)
+                self.press("back")
+                return
+        if self(resourceId="com.chinamworld.main:id/dlg_right_tv").exists(timeout=15):
+            self(resourceId="com.chinamworld.main:id/dlg_right_tv").click()
             self.sleep(1)
             self.press("back")
             return
-    if self(resourceId="com.chinamworld.main:id/dlg_right_tv").exists(timeout=15):
-        self(resourceId="com.chinamworld.main:id/dlg_right_tv").click()
-        self.sleep(1)
-        self.press("back")
-        return
-    self.wait_activity("com.ccb.framework.app.TitledActivity", timeout=20)
-    if self(className='android.widget.RelativeLayout', index="1").exists(timeout=20):
-        settings.check_transaction = True
-        while settings.check_transaction:
-            make_transaction()
-        print('settings.total_transaction: %s' % settings.total_transaction)
-        if len(settings.total_transaction) > 0:
-            params = {'account_alias': settings.bot.account.alias, 'balance': settings.total_transaction[0]['balance'],
-                      'transactions': settings.total_transaction}
-            report_transaction(params)
-            settings.total_transaction = []
-        self.sleep(1)
-        self.press("back")
-        self.sleep(1)
-        self.press("back")
+        self.wait_activity("com.ccb.framework.app.TitledActivity", timeout=20)
+        if self(className='android.widget.RelativeLayout', index="1").exists(timeout=20):
+            settings.check_transaction = True
+            while settings.check_transaction:
+                make_transaction()
+            print('settings.total_transaction: %s' % settings.total_transaction)
+            if len(settings.total_transaction) > 0:
+                params = {'account_alias': settings.bot.account.alias, 'balance': settings.total_transaction[0]['balance'],
+                          'transactions': settings.total_transaction}
+                report_transaction(params)
+                settings.total_transaction = []
+            self.sleep(1)
+            self.press("back")
+            self.sleep(1)
+            self.press("back")
 
 
 def make_transaction():
