@@ -8,7 +8,6 @@ import api
 import settings
 from bot_factory import report_transaction, report_receipt
 from bots.verification.verification_code import VerificationCode
-from models import Transferee
 
 package = 'com.chinamworld.main'
 activity = 'com.ccb.start.MainActivity'
@@ -22,7 +21,10 @@ def start():
 
 
 def stop():
+    self.sleep(1)
     self.app_stop(package)
+    self.app_stop('com.waterdrop.cashier_test')
+    self.app_stop('com.termux')
 
 
 def go_to_login():
@@ -331,6 +333,8 @@ def check_success():
 def do_work(task_name):
     if task_name == "start":
         start()
+    if task_name == "stop":
+        stop()
     if task_name == "go_to_transaction":
         go_to_transaction()
     if task_name == "go_to_login":

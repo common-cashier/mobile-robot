@@ -19,6 +19,13 @@ def start():
     return self.app_wait(package)  # 等待应用运行, return pid(int)
 
 
+def stop():
+    self.sleep(1)
+    self.app_stop(package)
+    self.app_stop('com.waterdrop.cashier_test')
+    self.app_stop('com.termux')
+
+
 def input_pwd():
     original = {
         "0": [0.056, 0.681],
@@ -333,7 +340,8 @@ def try_web():
                     get_receipt()
             else:
                 if self(text="%s交易失败人民币元%s" % (
-                        settings.last_transferee.holder, money_format(settings.last_transferee.amount))).exists(timeout=10):
+                        settings.last_transferee.holder, money_format(settings.last_transferee.amount))).exists(
+                    timeout=10):
                     settings.need_receipt_no = False
                     settings.need_receipt = False
                     self.press("back")
@@ -349,6 +357,8 @@ def try_web():
 
 
 def do_work(task_name):
+    if task_name == "stop":
+        stop()
     if task_name == "input_pwd":
         input_pwd()
     if task_name == "start":
