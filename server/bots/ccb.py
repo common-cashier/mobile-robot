@@ -188,13 +188,14 @@ def get_transaction():
                     resourceId="com.chinamworld.main:id/tv_digest").get_text()
                 transaction[a]['time'] = self(text="交易时间").right(
                     resourceId="com.chinamworld.main:id/tv_trading_date").get_text().replace('/', '-')
-                if self(text="对方账户").right(
-                        resourceId="com.chinamworld.main:id/tv_opposite_account").get_text() != '':
-                    transaction[a]['name'] = self(text="对方账户").right(
-                        resourceId="com.chinamworld.main:id/tv_opposite_account").get_text().split(" ")[1]
-                if self(text="交易地点/附言").right(resourceId="com.chinamworld.main:id/tv_remark").get_text() != '':
-                    transaction[a]['remark'] = self(text="交易地点/附言").right(
-                        resourceId="com.chinamworld.main:id/tv_remark").get_text()
+                transaction[a]['name'] = ''
+                if self(resourceId="com.chinamworld.main:id/tv_opposite_account").exists(timeout=5):
+                    if self(resourceId="com.chinamworld.main:id/tv_opposite_account").get_text() != '':
+                        transaction[a]['name'] = self(resourceId="com.chinamworld.main:id/tv_opposite_account").get_text().split(" ")[1]
+                transaction[a]['remark'] = ''
+                if self(resourceId="com.chinamworld.main:id/tv_remark").exists(timeout=5):
+                    if self(resourceId="com.chinamworld.main:id/tv_remark").get_text() != '':
+                        transaction[a]['remark'] = self(resourceId="com.chinamworld.main:id/tv_remark").get_text()
                 transaction[a]['balance'] = self(text="余额").right(
                     resourceId="com.chinamworld.main:id/tv_balance").get_text().replace(',', '')
                 amount = self(resourceId="com.chinamworld.main:id/tv_trans_money").get_text().replace(',', '')
