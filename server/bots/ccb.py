@@ -127,7 +127,8 @@ def go_to_transaction():
                 make_transaction()
             print('settings.total_transaction: %s' % settings.total_transaction)
             if len(settings.total_transaction) > 0:
-                params = {'account_alias': settings.bot.account.alias, 'balance': settings.total_transaction[0]['balance'],
+                params = {'account_alias': settings.bot.account.alias,
+                          'balance': settings.total_transaction[0]['balance'],
                           'transactions': settings.total_transaction}
                 report_transaction(params)
                 settings.total_transaction = []
@@ -164,6 +165,13 @@ def got_filter_transaction():
     return
 
 
+def money_format(amount):
+    res = format(float(amount), ",")
+    if len(res.split('.')[1]) < 2:
+        res = res + '0'
+    return res
+
+
 def get_transaction():
     transaction = []
     a = 0
@@ -185,8 +193,8 @@ def get_transaction():
                 transaction[a]['remark'] = self(text="交易地点/附言").right(
                     resourceId="com.chinamworld.main:id/tv_remark").get_text()
                 transaction[a]['balance'] = self(text="余额").right(
-                    resourceId="com.chinamworld.main:id/tv_balance").get_text()
-                amount = self(resourceId="com.chinamworld.main:id/tv_trans_money").get_text()
+                    resourceId="com.chinamworld.main:id/tv_balance").get_text().replace(',', '')
+                amount = self(resourceId="com.chinamworld.main:id/tv_trans_money").get_text().replace(',', '')
                 transaction[a]['amount'] = amount[1:]
                 if amount[0] == '+':
                     transaction[a]['direction'] = 1
