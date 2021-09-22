@@ -159,10 +159,10 @@ class BotFactory:
     def cast_work(self, params):
         if params['do_work'] == "stop":
             if self.bank == '':
-                return {'code': 0, 'msg': '卡机状态已经上报！'}
+                return {'code': 0, 'msg': '卡机停止状态已经上报！'}
             else:
                 self.bank.do_work(params['do_work'])
-            return
+                return {'code': 0, 'msg': '卡机停止状态已经上报！'}
         if self.doing:
             return False
         self.doing = True
