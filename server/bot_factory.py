@@ -157,6 +157,12 @@ class BotFactory:
             return {'code': 1, 'msg': rsp['msg'], 'data': rsp['data']}
 
     def cast_work(self, params):
+        if params['do_work'] == "stop":
+            if self.bank == '':
+                return {'code': 0, 'msg': '卡机状态已经上报！'}
+            else:
+                self.bank.do_work(params['do_work'])
+            return
         if self.doing:
             return False
         self.doing = True
@@ -166,9 +172,6 @@ class BotFactory:
             module = __import__("bots.%s" % settings.bot.bank.lower())
             robot = getattr(module, settings.bot.bank.lower())
             self.bank = robot
-        if params['do_work'] == "stop":
-            if self.bank == '':
-                return {'code': 0, 'msg': '卡机状态已经上报！'}
         if params['do_work'] == "go_to_transfer":
             if settings.need_receipt_no:
                 self.bank.do_work('go_to_receipt')
