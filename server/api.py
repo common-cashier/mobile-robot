@@ -3,8 +3,8 @@ from settings import api, Status
 import misc
 
 
-def start(account_alias):
-    return post(api['start'], {'accountAlias': account_alias})
+def start(account_alias, devices_id=''):
+    return post(api['start'], {'accountAlias': account_alias, 'devicesId': devices_id})
 
 
 def status(account_alias, state):

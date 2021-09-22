@@ -143,7 +143,10 @@ class BotFactory:
         if self.doing:
             return False
         self.doing = True
-        rsp = api.start(params['account_alias'])
+        if params['devices_id'] is not None and params['devices_id'] != '':
+            rsp = api.start(params['account_alias'], params['devices_id'])
+        else:
+            rsp = api.start(params['account_alias'])
         if rsp['code'] == 0 and rsp['data'] is not None:
             convert(rsp['data'], params['bank'].lower())
             log("rsp['data']: %s" % rsp)
