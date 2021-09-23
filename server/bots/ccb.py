@@ -23,7 +23,6 @@ def start():
 def stop():
     self.sleep(1)
     self.app_stop(package)
-    self.app_stop('com.waterdrop.cashier_test')
     self.app_stop('com.termux')
 
 
