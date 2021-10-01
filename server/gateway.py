@@ -102,11 +102,16 @@ def sms():
                 return ext
             try:
                 settings.last_sms = params['sms']
-                rsp = bot_util.cast_sms(params)
-                rsp = rsp is not None and rsp or {'code': 1, 'msg': '服务器未响应，请稍后再试!'}
-                rsp = {'code': 0, 'msg': rsp}
-                print('/sms rsp: %s ' % rsp)
-                return rsp
+                if bot_util.cast_sms is not None:
+                    rsp = bot_util.cast_sms(params)
+                    rsp = rsp is not None and rsp or {'code': 1, 'msg': '服务器未响应，请稍后再试!'}
+                    rsp = {'code': 0, 'msg': rsp}
+                    print('/sms rsp: %s ' % rsp)
+                    return rsp
+                else:
+                    ext = {'code': 1, 'msg': '需要先启动卡机'}
+                    print('/sms rsp: %s 需要先启动卡机' % ext)
+                    return ext
             except Exception as ext:
                 ext = {'code': 1, 'msg': ext}
                 print('/sms rsp: %s 需要先启动卡机' % ext)

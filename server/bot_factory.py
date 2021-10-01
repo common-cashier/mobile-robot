@@ -107,10 +107,17 @@ def report_receipt(params):
 def day_filter(time_str):
     arr = time_str.split('-')
     date_time = arr[2].split(' ')
+    month = arr[1]
     day = date_time[0]
+    need_change = False
+    if len(month) > 2 or len(day) > 2:
+        need_change = True
+    if len(month) > 2:
+        month = month[1:]
     if len(day) > 2:
         day = day[1:]
-        date = arr[0] + '-' + arr[1] + '-' + day + ' ' + date_time[1]
+    if need_change:
+        date = arr[0] + '-' + month + '-' + day + ' ' + date_time[1]
         print('before date: %s last date: %s' % (time_str, date))
         return date
     else:
