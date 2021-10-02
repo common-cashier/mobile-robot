@@ -261,7 +261,7 @@ def input_amount():
             self(resourceId=num_keyboard[9]).click()
         if amount_num == ".":
             self(resourceId=num_keyboard[10]).click()
-        settings.log('press amount key: %s' % amount_num, settings.Level.COMMON)
+        settings.log('press amount key: %s %s' % (amount_num, datetime.datetime.now()), settings.Level.COMMON)
     self(resourceId="com.android.systemui:id/back").click()
     self.sleep(3)
 
