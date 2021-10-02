@@ -247,6 +247,7 @@ def transfer():
     self.sleep(3)
     self(resourceId="com.chinamworld.main:id/et_tran_amount").click()
     self.send_keys(settings.transferee.amount, clear=True)
+    settings.log('press amount key: ' % settings.transferee.amount, settings.Level.COMMON)
     self.sleep(3)
     self(resourceId="com.android.systemui:id/back").click()
     self.sleep(3)
