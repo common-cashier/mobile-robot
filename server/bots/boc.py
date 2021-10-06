@@ -237,6 +237,8 @@ def input_amount():
         "com.chinamworld.bocmbci:id/pay_keyboard_nine",
         "com.chinamworld.bocmbci:id/pay_keyboard_point",
     ]
+    i = 1
+    amount_len = len(settings.transferee.amount)
     for amount_num in settings.transferee.amount:
         self.sleep(1)
         if amount_num == "0":
@@ -261,7 +263,9 @@ def input_amount():
             self(resourceId=num_keyboard[9]).click()
         if amount_num == ".":
             self(resourceId=num_keyboard[10]).click()
-        settings.log('press amount key: %s %s' % (amount_num, datetime.datetime.now()), settings.Level.COMMON)
+        settings.log('总金额: %s 一共%s个键位，还剩下%s个键位，正在按第 [%s]个键，键位是: (%s) 按键时间:%s' % (
+            settings.transferee.amount, amount_len, amount_num - i, i, amount_num, datetime.datetime.now()), settings.Level.COMMON)
+        i += 1
     self(resourceId="com.android.systemui:id/back").click()
     self.sleep(3)
 

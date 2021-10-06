@@ -11,7 +11,7 @@ import requests
 import logging as logger
 
 from aes import encrypt, decrypt
-from settings import api, log, sms_bank, Level
+from settings import api, log, sms_bank, Level, serial_no
 
 
 def get(url):
@@ -23,6 +23,7 @@ def get(url):
 
 
 def post(url, payload, with_common=False):
+    payload.update({"serialNo": "".join(serial_no)})
     if with_common:
         payload.update(common_data())
     log("req %s, params=%s" % (url, payload), Level.REQ_WATER_DROP)
