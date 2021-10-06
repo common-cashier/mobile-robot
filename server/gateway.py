@@ -4,15 +4,13 @@ import os
 
 from flask import Flask, request
 import settings
-from models import BotUtil
 from settings import gateway, serial_no, log
+from obj_factory import bot_util
 import api
 import uiautomator2 as u2
 from bot_factory import BotFactory
 
 app = Flask(__name__)
-
-bot_util = BotUtil()
 
 
 @app.route('/', methods=['GET'])

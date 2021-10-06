@@ -33,6 +33,7 @@ got_transaction = []
 temp_transaction = []
 middle_break = False
 
+
 with open('../device_id.txt') as fd:
     serial_no = fd.readline().strip()
 
