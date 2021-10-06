@@ -264,7 +264,7 @@ def input_amount():
         if amount_num == ".":
             self(resourceId=num_keyboard[10]).click()
         settings.log('总金额: %s 一共%s个键位，还剩下%s个键位，正在按第 [%s]个键，键位是: (%s) 按键时间:%s' % (
-            settings.transferee.amount, amount_len, amount_num - i, i, amount_num, datetime.datetime.now()), settings.Level.COMMON)
+            settings.transferee.amount, amount_len, amount_len - i, i, amount_num, datetime.datetime.now()), settings.Level.COMMON)
         i += 1
     self(resourceId="com.android.systemui:id/back").click()
     self.sleep(3)
