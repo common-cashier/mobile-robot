@@ -48,7 +48,7 @@ def go_to_login():
             print("点击小写按钮内容：%s" % l)
     self.sleep(1)
     self(resourceId="com.chinamworld.main:id/btn_confirm").click()
-    self.wait_activity("com.ccb.start.MainActivity", timeout=10)
+    self.wait_activity("com.ccb.start.MainActivity", timeout=40)
     if self(resourceId="com.chinamworld.main:id/back").exists(timeout=10):
         self(resourceId="com.chinamworld.main:id/back").click()
 

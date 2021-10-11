@@ -4,6 +4,7 @@ import os
 
 from flask import Flask, request
 import settings
+from update import update_init
 from settings import gateway, serial_no, log
 from obj_factory import bot_util
 import api
@@ -15,13 +16,14 @@ app = Flask(__name__)
 
 @app.route('/', methods=['GET'])
 def hello():
-    app.logger.log_text(serial_no)
-    return serial_no
+    settings.ip()
+    return "hello world"
 
 
 @app.route('/check_evn', methods=['GET'])
 def check():
     try:
+        settings.ip()
         ready = len(dir(u2)) > 100
         rsp = ready and {'code': 0, 'msg': '环境安装成功！'} or {'code': 1, 'msg': '环境安装失败，请重装！'}
         log('/check_env rsp: %s' % rsp)
@@ -37,6 +39,7 @@ def check():
 @app.route('/status', methods=['POST'])
 def status():
     if request.is_json:
+        settings.ip()
         try:
             params = request.get_json()
             log('/status req: %s' % params)
@@ -55,6 +58,7 @@ def status():
 @app.route('/last_transaction', methods=['POST'])
 def last_transaction():
     if request.is_json:
+        settings.ip()
         try:
             params = request.get_json()
             log('/last_transaction req: %s' % params)
@@ -73,6 +77,7 @@ def last_transaction():
 @app.route('/transaction', methods=['POST'])
 def transaction():
     if request.is_json:
+        settings.ip()
         try:
             params = request.get_json()
             log('/transaction req: %s' % params)
@@ -91,6 +96,7 @@ def transaction():
 @app.route('/sms', methods=['POST'])
 def sms():
     if request.is_json:
+        settings.ip()
         try:
             params = request.get_json()
             print('/sms req: %s' % params)
@@ -124,6 +130,7 @@ def sms():
 def start():
     global rsp
     if request.is_json:
+        settings.ip()
         try:
             # config = load_config()
             # if config is None or 'account' not in config:
@@ -188,6 +195,7 @@ def start():
 @app.route('/account_info', methods=['POST'])
 def account_info():
     try:
+        settings.ip()
         print('settings.account_data ---------> %s' % settings.account_data)
         rsp = {'code': 0, 'msg': '成功', 'data': settings.account_data}
         log('/account_info rsp: %s' % rsp)
@@ -206,6 +214,7 @@ def account_info():
 @app.route('/do_work', methods=['POST'])
 def do_work():
     if request.is_json:
+        settings.ip()
         try:
             params = request.get_json()
             log('/do_work req: %s' % params)
@@ -248,4 +257,5 @@ def load_config():
 
 
 if __name__ == '__main__':
+    update_init()
     app.run(host=gateway['host'], port=gateway['port'])

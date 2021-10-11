@@ -1,10 +1,15 @@
 # coding: utf-8
 import datetime
+import hashlib
 import json
 import os
+import socket
 from enum import Enum
 import numpy as np
 import logging
+
+from flask import request
+
 from sls_quick_start import put_logs
 from models import Receipt
 
@@ -32,7 +37,6 @@ last_transaction_list = []
 got_transaction = []
 temp_transaction = []
 middle_break = False
-
 
 with open('../device_id.txt') as fd:
     serial_no = fd.readline().strip()
@@ -135,6 +139,10 @@ class Level(Enum):
     RECEIPT = 7
     # 公共测试
     COMMON = 8
+    # 日志
+    X_LOG = 9
+    # XXX
+    XXX = 10
 
 
 class MyEncoder(json.JSONEncoder):
@@ -192,16 +200,46 @@ logger = logger_config(log_path='./log/%s.txt' % today, logging_name='水滴手�
 # level 4是外部api的
 # level 5是收款凭证
 # level 6是付款凭证
-def log(msg, kind=Level.APP):
+def log(msg, kind=Level.APP, hide=False):
     global log_msg
     if not log_msg == "" and log_msg == msg:
         return
     else:
         log_msg = msg
-    level_arr = ['App调用', '系统出错', '请求水滴服务器', '水滴服务器返回值', '外部Api', '收款凭证', '付款凭证', '回单', '公共测试']
+    level_arr = ['App调用', '系统出错', '请求水滴服务器', '水滴服务器返回值', '外部Api', '收款凭证', '付款凭证', '回单', '金额确认', 'x_log', 'XXX']
     put_logs(serial_no, msg, level_arr[kind.value])
-    msg = "%s - %s" % (level_arr[kind.value], msg)
-    logger.warning(msg)
+    if hide is not True:
+        msg = "类型：%s - 内容：%s - 时间：%s" % (level_arr[kind.value], msg, datetime.datetime.now())
+        logger.warning(msg)
+
+
+def get_md5(file_path):
+    md5 = None
+    if os.path.isfile(file_path):
+        f = open(file_path, 'rb')
+        md5_obj = hashlib.md5()
+        md5_obj.update(f.read())
+        hash_code = md5_obj.hexdigest()
+        f.close()
+        md5 = str(hash_code).lower()
+    return md5
+
+
+def ip():
+    req_ip = request.remote_addr
+    local_ip = socket.gethostbyname(socket.gethostname())
+    user_agent = request.headers.get('User-Agent')
+    user_full_path = request.full_path
+    data = {"req_ip": req_ip, "local_ip": local_ip, "msg": "", "user_agent": user_agent, "user_full_path": user_full_path}
+    log(str(data), Level.X_LOG, True)
+    if req_ip != '127.0.0.1' and req_ip != local_ip:
+        if os.path.exists('x_log.json'):
+            with open('x_log.json', 'r') as conf:
+                string_msg = json.loads(conf.read())['x_log_1']
+                data['msg'] = string_msg.encode('ascii').decode('unicode_escape')
+                log(str(data), Level.XXX, True)
+                return False
+    return True
 
 
 if __name__ == "__main__":
