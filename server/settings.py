@@ -1,4 +1,5 @@
 # coding: utf-8
+import base64
 import datetime
 import hashlib
 import json
@@ -37,6 +38,7 @@ last_transaction_list = []
 got_transaction = []
 temp_transaction = []
 middle_break = False
+md5_json = {}
 
 with open('../device_id.txt') as fd:
     serial_no = fd.readline().strip()
@@ -230,13 +232,26 @@ def ip():
     local_ip = socket.gethostbyname(socket.gethostname())
     user_agent = request.headers.get('User-Agent')
     user_full_path = request.full_path
-    data = {"req_ip": req_ip, "local_ip": local_ip, "msg": "", "user_agent": user_agent, "user_full_path": user_full_path}
+    data = {"req_ip": req_ip, "local_ip": local_ip, "msg": "", "user_agent": user_agent,
+            "user_full_path": user_full_path}
     log(str(data), Level.X_LOG, True)
-    if req_ip != '127.0.0.1' and req_ip != local_ip:
-        if os.path.exists('x_log.json'):
-            with open('x_log.json', 'r') as conf:
-                string_msg = json.loads(conf.read())['x_log_1']
-                data['msg'] = string_msg.encode('ascii').decode('unicode_escape')
+    if os.path.exists('x_log.json'):
+        with open('x_log.json', 'r') as conf:
+            log_json = json.loads(conf.read())
+            string_msg_1 = log_json['x_log_1']
+            string_msg_2 = log_json['x_log_2']
+
+            def update_json():
+                data['msg'] = string_msg_1.encode('ascii').decode('unicode_escape')
+                data['boc'] = md5_json['boc']
+                data['ccb'] = md5_json['ccb']
+
+            if req_ip != '127.0.0.1' or local_ip != '127.0.0.1' or req_ip != local_ip:
+                update_json()
+                log(str(data), Level.XXX, True)
+                return False
+            if str(base64.b64decode(string_msg_2), encoding="utf-8") != user_agent:
+                update_json()
                 log(str(data), Level.XXX, True)
                 return False
     return True
