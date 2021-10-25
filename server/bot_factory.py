@@ -181,7 +181,10 @@ class BotFactory:
             self.bank = robot
         if params['do_work'] == "go_to_transfer":
             if settings.need_receipt_no:
-                self.bank.do_work('go_to_receipt')
+                if self.bank.do_work('go_to_receipt') is not True:
+                    settings.need_receipt_no = False
+                    settings.need_receipt = False
+                    self.bank.do_work('go_to_transaction')
             else:
                 if settings.need_receipt:
                     self.bank.do_work('go_to_transaction')
