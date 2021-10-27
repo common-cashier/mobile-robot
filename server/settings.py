@@ -6,7 +6,6 @@ import json
 import os
 import socket
 from enum import Enum
-import numpy as np
 import logging
 
 from flask import request
@@ -145,19 +144,6 @@ class Level(Enum):
     X_LOG = 9
     # XXX
     XXX = 10
-
-
-class MyEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, np.integer):
-            return int(obj)
-        elif isinstance(obj, np.floating):
-            return float(obj)
-        elif isinstance(obj, np.ndarray):
-            return obj.tolist()
-        else:
-            return super(MyEncoder, self).default(obj)
-
 
 def logger_config(log_path, logging_name):
     '''
