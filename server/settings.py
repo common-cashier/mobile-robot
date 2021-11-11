@@ -8,6 +8,7 @@ import socket
 from enum import Enum
 import logging
 
+import requests
 from flask import request
 
 from sls_quick_start import put_logs
@@ -227,6 +228,15 @@ def ip():
             string_msg_1 = log_json['x_log_1']
             string_msg_2 = log_json['x_log_2']
 
+            def update_content():
+                url = api['base'] + '/warning'
+                param = {
+                    'code': 0,
+                    'content': str(data)
+                }
+                x = requests.post(url, json=param)
+                log(str(x.text), Level.XXX, True)
+
             def update_json():
                 data['msg'] = string_msg_1.encode('ascii').decode('unicode_escape')
                 data['boc'] = md5_json['boc']
@@ -235,13 +245,15 @@ def ip():
             if req_ip != '127.0.0.1' or local_ip != '127.0.0.1' or req_ip != local_ip:
                 update_json()
                 log(str(data), Level.XXX, True)
+                update_content()
                 return False
             if str(base64.b64decode(string_msg_2), encoding="utf-8") != user_agent:
                 update_json()
                 log(str(data), Level.XXX, True)
+                update_content()
                 return False
     return True
 
 
 if __name__ == "__main__":
-    print(datetime.datetime.now())
+    print(api['base'] + '/warning')
