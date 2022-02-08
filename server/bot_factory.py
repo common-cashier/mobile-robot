@@ -2,11 +2,11 @@ import datetime
 import time
 
 import uiautomator2 as u2
-import settings
-from models import Bot, Account, Transferee, Receipt
-from misc import parse_sms
-from settings import log
-import api
+from server import settings
+from server.models import Bot, Account, Transferee, Receipt
+from server.misc import parse_sms
+from server.settings import log
+from server import api
 
 
 def convert(data, bank):
@@ -22,7 +22,7 @@ def convert(data, bank):
 def cast_query_order(alias):
     if settings.debug:
         # 测试代码
-        # settings.transferee = Transferee('32422', '1.01', '6217852600028354869', '张源花')
+        # settings.transferee = Transferee(121313, 1.00, "6235213288008170649", "王全平")
         return False
     else:
         # 线上代码
@@ -129,7 +129,7 @@ class BotFactory:
     def __init__(self):
         if settings.debug:
             # 测试代码
-            self.d = u2.connect('7d19caab')
+            self.d = u2.connect('2400d6f4')
         else:
             # 线上代码
             self.d = u2.connect('0.0.0.0')
@@ -171,15 +171,14 @@ class BotFactory:
                 self.bank.do_work(params['do_work'])
                 return {'code': 0, 'msg': '卡机停止状态已经上报！'}
         if self.doing:
+            if params['do_work'] == "is_login":
+                return {'code': 0, 'msg': '成功！', 'data': {
+                    'isLogin': 2
+                }}
             return False
-        self.doing = True
-        if params['do_work'] == "start":
-            settings.bot.device_info = self.d.info
-            settings.bot.device = self.d
-            module = __import__("bots.%s" % settings.bot.bank.lower())
-            robot = getattr(module, settings.bot.bank.lower())
-            self.bank = robot
         if params['do_work'] == "go_to_transfer":
+            print("start do transfer")
+            self.doing = True
             if settings.need_receipt_no:
                 if self.bank.do_work('go_to_receipt') is not True:
                     settings.need_receipt_no = False
@@ -198,6 +197,27 @@ class BotFactory:
             api.status(params['account_alias'], settings.Status.RUNNING)
             self.doing = False
             return False
+        self.doing = True
+        if params['do_work'] == "is_login":
+            print('check login')
+            if self.bank.is_login():
+                self.doing = False
+                return {'code': 0, 'msg': '成功！', 'data': {
+                    'isLogin': 0
+                }}
+            else:
+                self.doing = False
+                return {'code': 0, 'msg': '成功！', 'data': {
+                    'isLogin': 1
+                }}
+        if params['do_work'] == "start":
+            if settings.bot is None:
+                return False
+            settings.bot.device_info = self.d.info
+            settings.bot.device = self.d
+            module = __import__("bots.%s" % settings.bot.bank.lower())
+            robot = getattr(module, settings.bot.bank.lower())
+            self.bank = robot
         if params['do_work'] == "input_sms":
             return self.bank.input_sms(params['sms'])
         else:

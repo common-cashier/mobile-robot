@@ -1,6 +1,6 @@
 # coding: utf-8
-from settings import api, Status
-import misc
+from server.settings import api
+from server import misc
 
 
 def start(account_alias, devices_id=''):

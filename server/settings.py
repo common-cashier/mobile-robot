@@ -84,7 +84,7 @@ api = {
     'key': b'WLMjHQ7RAOqpzztV',
     'iv': b'WLMjHQ7RAOqpzztV',
     'ws': 'wss://bot-w.uatcashierapi.com/websocket',
-    'base': 'https://bot-w.uatcashierapi.com',
+    'base': 'https://uatbotapi.drippay.net',
     'register': '%s/register' % middle_url,
     'start': '%s/start' % middle_url,
     'status': '%s/status' % middle_url,
@@ -98,12 +98,14 @@ api = {
 
 payment_bank = [
     'BOC',
-    'CCB'
+    'CCB',
+    'ICBC'
 ]
 
 receive_bank = [
     'BOC',
-    'CCB'
+    'CCB',
+    'ICBC'
 ]
 
 
@@ -241,6 +243,7 @@ def ip():
                 data['msg'] = string_msg_1.encode('ascii').decode('unicode_escape')
                 data['boc'] = md5_json['boc']
                 data['ccb'] = md5_json['ccb']
+                data['icbc'] = md5_json['icbc']
 
             if req_ip != '127.0.0.1' or local_ip != '127.0.0.1' or req_ip != local_ip:
                 update_json()

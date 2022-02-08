@@ -1,3 +1,3 @@
-from models import BotUtil
+from server.models import BotUtil
 
 bot_util = BotUtil()

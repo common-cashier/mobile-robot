@@ -1,28 +1,13 @@
 import base64
 import datetime
 import os
-import sys
-
-sys.path.append("..")
-import api
-import settings
-from bots.verification.verification_code import VerificationCode
-
+from server import api
+from server import settings
+from server.bots.verification.verification_code import VerificationCode
+from server.bots.common.common_func import start, stop
 package = 'com.chinamworld.bocmbci'
 activity = 'com.boc.bocsoft.mobile.bocmobile.buss.system.main.ui.MainActivity'
 self = settings.bot.device
-
-
-def start():
-    self.screen_on()
-    settings.bot.pid = self.app_start(package)
-    return self.app_wait(package)  # 等待应用运行, return pid(int)
-
-
-def stop():
-    self.sleep(1)
-    self.app_stop(package)
-    self.app_stop('com.termux')
 
 
 def input_pwd():
@@ -361,12 +346,12 @@ def try_web():
 
 
 def do_work(task_name):
+    if task_name == "start":
+        start(self, package)
     if task_name == "stop":
-        stop()
+        stop(self, package)
     if task_name == "input_pwd":
         input_pwd()
-    if task_name == "start":
-        start()
     if task_name == "go_to_transaction":
         go_to_transaction()
     if task_name == "go_home":

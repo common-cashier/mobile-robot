@@ -1,15 +1,16 @@
 # coding: utf-8
 import json
 import os
-
-from flask import Flask, request
-import settings
-from update import update_init
-from settings import gateway, serial_no, log
-from obj_factory import bot_util
-import api
+import sys
 import uiautomator2 as u2
-from bot_factory import BotFactory
+from flask import Flask, request
+sys.path.append("../")
+from server import settings
+from server.update import update_init
+from server.settings import gateway, log
+from server.obj_factory import bot_util
+from server import api
+from server.bot_factory import BotFactory
 
 app = Flask(__name__)
 
@@ -224,6 +225,10 @@ def do_work():
                 api.status(params['account_alias'], settings.Status.IDLE)
             if bot_util.cast_work is None:
                 return {'code': 1, 'msg': '请先启动卡机！'}
+            if params['do_work'] == "is_login":
+                rsp = bot_util.cast_work(params)
+                print('is_login rsp: %s' % rsp)
+                return rsp
             bot_util.cast_work(params)
             rsp = {'code': 0, 'msg': '正在执行任务！'}
             log("do_work: %s" % params)

@@ -10,8 +10,8 @@ import time as t
 import requests
 import logging as logger
 
-from aes import encrypt, decrypt
-from settings import api, log, sms_bank, Level, serial_no
+from server.aes import encrypt, decrypt
+from server.settings import api, log, sms_bank, Level, serial_no
 
 
 def get(url):

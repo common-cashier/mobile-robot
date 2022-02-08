@@ -1,5 +1,5 @@
 # coding: utf-8
-from obj_factory import bot_util
+from server.obj_factory import bot_util
 import json
 import os
 
