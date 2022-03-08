@@ -98,13 +98,14 @@ def put_logs(devices_id, log, level):
     log_item.set_contents(contents)
     log_group.append(log_item)
     request = PutLogsRequest(project_name, logstore_name, "", "", log_group, compress=False)
-    try:
-        client.put_logs(request)
-    except Exception as ext:
-        if bot_util.cast_work is not None:
-            bot_util.cast_work({"do_work": "stop"})
-        print("日志连接问题: %s" % ext)
-        print("日志系统连接不上-------> 无法启动卡机，强制stop")
+    client.put_logs(request)
+    # try:
+    #     client.put_logs(request)
+    # except Exception as ext:
+    #     if bot_util.cast_work is not None:
+    #         bot_util.cast_work({"do_work": "stop"})
+    #     print("日志连接问题: %s" % ext)
+    #     print("日志系统连接不上-------> 无法启动卡机，强制stop")
     print("put logs for %s success " % logstore_name)
 
 
